@@ -1,0 +1,60 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "krokedil/klarna-express-checkout",
+    "description": "A Klarna Express Checkout solution for WooCommerce",
+    "type": "library",
+    "version": "1.0.0",
+    "require-dev": {
+        "php-stubs/woocommerce-stubs": "^8.3",
+        "10up/wp_mock": "^1.0",
+        "wp-coding-standards/wpcs": "^3.0"
+    },
+    "license": "GPL-v3",
+    "autoload": {
+        "psr-4": {
+            "Krokedil\\KlarnaExpressCheckout\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Krokedil AB",
+            "email": "info@krokedil.se"
+        }
+    ],
+    "require": {
+        "php": "~7.4 || ~8.0",
+        "firebase/php-jwt": "^6.10"
+    },
+    "archive": {
+        "exclude": [
+            "tests/*",
+            "phpunit.xml",
+            "composer-lock.json",
+            ".github/*",
+            ".gitignore",
+            ".gitattributes"
+        ]
+    },
+    "scripts": {
+        "phpcs": [
+            "phpcs --standard=phpcs.xml --extensions=php --ignore=vendor/,tests/"
+        ],
+        "phpcbf": [
+            "phpcbf --standard=phpcs.xml --extensions=php --ignore=vendor/,tests/"
+        ],
+        "test": [
+            "phpunit --configuration phpunit.xml"
+        ],
+        "test-coverage-html": [
+            "phpunit --configuration phpunit.xml --coverage-html coverage"
+        ],
+        "test-coverage-clover": [
+            "phpunit --configuration phpunit.xml --coverage-clover coverage.xml"
+        ]
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}
