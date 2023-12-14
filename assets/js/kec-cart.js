@@ -4,6 +4,19 @@ jQuery(function ($) {
      * Initialize the Klarna Express Checkout button.
      */
     init() {
+      // Load the Klarna Express Checkout button.
+      kec_cart.load();
+
+      // Add event listener to the cart update button.
+      $(document.body).on("updated_cart_totals", kec_cart.load);
+    },
+
+    /**
+     * Load the klarna express button.
+     *
+     * @returns {void}
+     */
+    load() {
       const { client_key, theme, shape } = kec_cart_params;
 
       window.Klarna.Payments.Buttons.init({
@@ -70,7 +83,7 @@ jQuery(function ($) {
         async: false,
         success: (result) => {
           payload = result.data || false;
-        }
+        },
       });
 
       return payload;
@@ -95,16 +108,16 @@ jQuery(function ($) {
         },
         async: false,
         success: (response) => {
-          if( response.success ) {
+          if (response.success) {
             result = response.data || false;
           } else {
             return false;
           }
-        }
+        },
       });
 
       return result;
-    }
+    },
   };
 
   window.klarnaAsyncCallback = kec_cart.init();
