@@ -22,6 +22,7 @@ jQuery(function ($) {
       const payload = kec_cart.getPayload();
 
       if (!payload) {
+        // TODO Handle errors.
         return;
       }
 
@@ -34,10 +35,16 @@ jQuery(function ($) {
     },
 
     async onAuthorizeHandler(authorizeResult) {
+      if (!authorizeResult.approved) {
+        // TODO Handle errors.
+        return;
+      }
+
       // Send the authorize result to the server.
       const authCallbackResult = await kec_cart.authCallback(authorizeResult);
 
       if (!authCallbackResult) {
+        // TODO Handle errors.
         return;
       }
 
