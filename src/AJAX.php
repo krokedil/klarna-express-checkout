@@ -111,22 +111,22 @@ class AJAX {
 		$posted_data = filter_input_array( INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		// Get the posted result.
-		$product_id = $posted_data['product_id'] ?? '';
-		$quantity   = $posted_data['quantity'] ?? 1;
+		$product_id   = $posted_data['product_id'] ?? '';
+		$variation_id = $posted_data['variation_id'] ?? null;
 
 		if ( empty( $product_id ) ) {
 			wp_send_json_error( 'No product ID was posted' );
-		}
-
-		if ( ! is_numeric( $quantity ) || $quantity < 1 ) {
-			wp_send_json_error( 'The quantity needs to be a number above 0' );
 		}
 
 		// Clear the cart.
 		WC()->cart->empty_cart();
 
 		// Add the product to the cart.
-		WC()->cart->add_to_cart( $product_id, $quantity );
+		$result = WC()->cart->add_to_cart( $product_id, 1, $variation_id );
+
+		if ( ! $result ) {
+			wp_send_json_error( 'Could not add the product to the cart' );
+		}
 
 		wp_send_json_success();
 	}
