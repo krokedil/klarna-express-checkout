@@ -9,7 +9,7 @@ defined( 'ABSPATH' ) || exit;
  * @package Krokedil\KlarnaExpressCheckout
  */
 class KlarnaExpressCheckout {
-	const VERSION = '1.0.0';
+	const VERSION = '1.1.0';
 
 	/**
 	 * Reference to the Assets class.
