@@ -17,6 +17,13 @@ class AJAX {
 	public $get_payload;
 
 	/**
+	 * The callback for the finalization of the Klarna Express Checkout.
+	 *
+	 * @var callable
+	 */
+	public $finalize_callback;
+
+	/**
 	 * The client token parser.
 	 *
 	 * @var ClientTokenParser
@@ -41,7 +48,9 @@ class AJAX {
 	public function add_ajax_events() {
 		$ajax_events = array(
 			'kec_get_payload',
+			'kec_set_cart',
 			'kec_auth_callback',
+			'kec_finalize_callback',
 		);
 
 		foreach ( $ajax_events as $ajax_event ) {
@@ -58,6 +67,14 @@ class AJAX {
 		$this->get_payload = $get_payload_method;
 	}
 
+	/**
+	 * Set the callback for the finalization of the Klarna Express Checkout.
+	 *
+	 * @param callable $finalize_callback The callable.
+	 */
+	public function set_finalize_callback( $finalize_callback ) {
+		$this->finalize_callback = $finalize_callback;
+	}
 
 	/**
 	 * Get the payload for the Klarna Express Checkout.
@@ -80,6 +97,38 @@ class AJAX {
 		} catch ( \Exception $e ) {
 			wp_send_json_error( $e->getMessage() );
 		}
+	}
+
+	/**
+	 * Set the cart in WooCommerce to the product KEC was initiated from.
+	 *
+	 * @return void
+	 */
+	public function kec_set_cart() {
+		// Verify nonce.
+		check_ajax_referer( 'kec_set_cart', 'nonce' );
+
+		$posted_data = filter_input_array( INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+
+		// Get the posted result.
+		$product_id = $posted_data['product_id'] ?? '';
+		$quantity   = $posted_data['quantity'] ?? 1;
+
+		if ( empty( $product_id ) ) {
+			wp_send_json_error( 'No product ID was posted' );
+		}
+
+		if ( ! is_numeric( $quantity ) || $quantity < 1 ) {
+			wp_send_json_error( 'The quantity needs to be a number above 0' );
+		}
+
+		// Clear the cart.
+		WC()->cart->empty_cart();
+
+		// Add the product to the cart.
+		WC()->cart->add_to_cart( $product_id, $quantity );
+
+		wp_send_json_success();
 	}
 
 	/**
@@ -119,14 +168,58 @@ class AJAX {
 		$klarna_address = $result['collected_shipping_address'];
 
 		$this->set_customer_address( $klarna_address );
+		KlarnaExpressCheckout::set_client_token( $client_token );
 
-		// If the class "KP_Klarna_Express_Checkout" exists, set the session data using the method "set_session_data".
-		if ( class_exists( 'KP_Klarna_Express_Checkout' ) ) {
-			\KP_Klarna_Express_Checkout::set_session_data( $token['payload']['session_id'], $client_token );
-		}
+		do_action( 'kec_auth_callback_processed', $result );
 
 		// Send a success response with a redirect URL to the checkout.
 		wp_send_json_success( wc_get_checkout_url() );
+	}
+
+	/**
+	 * Handle the finalize callback.
+	 *
+	 * @return void
+	 * @throws \Exception If the order could not be finalized.
+	 */
+	public function kec_finalize_callback() {
+		// Verify nonce.
+		check_ajax_referer( 'kec_finalize_callback', 'nonce' );
+
+		$posted_data = filter_input_array( INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+
+		// Get the posted result.
+		$result    = $posted_data['result'] ?? array();
+		$order_id  = $posted_data['order_id'] ?? '';
+		$order_key = $posted_data['order_key'] ?? '';
+
+		if ( empty( $result ) ) {
+			wp_send_json_error( 'No result was posted' );
+		}
+
+		// Get the approved status and auth token.
+		$approved   = $result['approved'] ?? false;
+		$auth_token = $result['authorization_token'] ?? '';
+
+		if ( ! $approved ) {
+			wp_send_json_error( 'The payment was not approved by Klarna' );
+		}
+
+		try {
+			if ( ! is_callable( $this->finalize_callback ) ) {
+				throw new \Exception( 'Could not finalize the order' );
+			}
+
+			$callback_response = call_user_func( $this->finalize_callback, $auth_token, $order_id, $order_key );
+
+			if ( ! is_array( $callback_response ) ) {
+				throw new \Exception( 'Could not finalize the order' );
+			}
+
+			wp_send_json_success( $callback_response );
+		} catch ( \Exception $e ) {
+			wp_send_json_error( $e->getMessage() );
+		}
 	}
 
 	/**
