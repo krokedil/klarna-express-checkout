@@ -1,5 +1,7 @@
 jQuery(function ($) {
   const kec_cart = {
+    selectedVariation: null,
+
     /**
      * Initialize the Klarna Express Checkout button.
      */
@@ -9,6 +11,8 @@ jQuery(function ($) {
 
       // Add event listener to the cart update button.
       $(document.body).on("updated_cart_totals", kec_cart.load);
+
+      $(document.body).on("found_variation", kec_cart.onFoundVariation);
     },
 
     /**
@@ -18,6 +22,10 @@ jQuery(function ($) {
      */
     load() {
       const { client_key, theme, shape } = kec_cart_params;
+
+      if (!kec_cart.checkVariation()) {
+        return;
+      }
 
       window.Klarna.Payments.Buttons.init({
         client_key: client_key,
@@ -31,7 +39,59 @@ jQuery(function ($) {
       });
     },
 
+    /**
+     * Handle the found variation event.
+     *
+     * @param {object} event
+     * @param {object} variation
+     *
+     * @returns {void}
+     */
+    onFoundVariation(event, variation) {
+      console.log("onFoundVariation", variation);
+      kec_cart.selectedVariation = variation;
+
+      kec_cart.load();
+    },
+
+    /**
+     * Checks if we are on a product page, and if so, if the product is a variable product.
+     * If it is, it will see if the customer has selected a variation.
+     *
+     * @returns {boolean} True if we can continue, or if we need to wait for a variation to be set.
+     */
+    checkVariation() {
+      const { is_product_page, product } = kec_cart_params;
+
+      if (!is_product_page) {
+        return true;
+      }
+
+      if (product.type !== "variable") {
+        return true;
+      }
+
+      return kec_cart.selectedVariation !== null;
+    },
+
+    /**
+     * Handle the click event on the KEC button.
+     *
+     * @param {function} authorize
+     * @returns
+     */
     onClickHandler(authorize) {
+      // If the customer is on the product page, we need to set the cart to only contain the product, and the quantity of it.
+      const { is_product_page } = kec_cart_params;
+      if (is_product_page) {
+        const setCartResult = kec_cart.productPageHandler();
+
+        if (!setCartResult) {
+          // TODO Handle errors.
+          return;
+        }
+      }
+
       const payload = kec_cart.getPayload();
 
       if (!payload) {
@@ -47,6 +107,12 @@ jQuery(function ($) {
       );
     },
 
+    /**
+     * Handle the authorize result from Klarna.
+     *
+     * @param {object} authorizeResult
+     * @returns {void}
+     */
     async onAuthorizeHandler(authorizeResult) {
       if (!authorizeResult.approved) {
         // TODO Handle errors.
@@ -63,6 +129,26 @@ jQuery(function ($) {
 
       // Redirect the customer to the redirect url.
       window.location.href = authCallbackResult;
+    },
+
+    /**
+     * Handle the product page logic.
+     *
+     * @returns {void}
+     */
+    productPageHandler() {
+      const { is_product_page, product } = kec_cart_params;
+
+      if (!is_product_page && kec_cart.checkVariation()) {
+        return;
+      }
+
+      let variationId = null;
+      if (product.type === "variable") {
+        variationId = kec_cart.selectedVariation.variation_id;
+      }
+
+      return kec_cart.setCustomerCart(product.id, variationId);
     },
 
     /**
@@ -113,6 +199,36 @@ jQuery(function ($) {
           } else {
             return false;
           }
+        },
+      });
+
+      return result;
+    },
+
+    /**
+     * Set the customer cart.
+     *
+     * @param {number} productId
+     * @param {number|null} variationId
+     *
+     * @returns {boolean}
+     */
+    setCustomerCart(productId, variationId = null) {
+      const { url, nonce, method } = kec_cart_params.ajax.set_cart;
+
+      let result = false;
+
+      $.ajax({
+        type: method,
+        url: url,
+        data: {
+          product_id: productId,
+          variation_id: variationId,
+          nonce: nonce,
+        },
+        async: false,
+        success: (response) => {
+          result = response.success || false;
         },
       });
 
