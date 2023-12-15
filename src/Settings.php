@@ -10,6 +10,13 @@ defined( 'ABSPATH' ) || exit;
  */
 class Settings {
 	/**
+	 * If KEC is enabled or not.
+	 *
+	 * @var bool
+	 */
+	private $enabled;
+
+	/**
 	 * The options key to get the KEC settings from.
 	 *
 	 * @var string
@@ -64,10 +71,20 @@ class Settings {
 
 		// Return only the KEC settings.
 		return array(
+			'kec_enabled'            => $settings['kec_enabled'] ?? 'no',
 			'kec_credentials_secret' => $settings['kec_credentials_secret'] ?? '',
 			'kec_theme'              => $settings['kec_theme'] ?? 'default',
 			'kec_shape'              => $settings['kec_shape'] ?? 'default',
 		);
+	}
+
+	/**
+	 * Get the enabled status for KEC.
+	 *
+	 * @return bool
+	 */
+	public function is_enabled() {
+		return 'yes' === $this->options['kec_enabled'] ?? 'no';
 	}
 
 	/**
@@ -108,6 +125,12 @@ class Settings {
 				'title' => __( 'Klarna Express Checkout', 'klarna-express-checkout' ),
 				'type'  => 'title',
 				'desc'  => __( 'Klarna Express Checkout is a fast and easy way for customers to pay with Klarna.', 'klarna-express-checkout' ),
+			),
+			'kec_enabled'            => array(
+				'title'   => __( 'Enable/Disable', 'klarna-express-checkout' ),
+				'type'    => 'checkbox',
+				'label'   => __( 'Enable Klarna Express Checkout', 'klarna-express-checkout' ),
+				'default' => 'no',
 			),
 			'kec_credentials_secret' => array(
 				'title'             => __( 'Credentials Secret', 'klarna-express-checkout' ),
