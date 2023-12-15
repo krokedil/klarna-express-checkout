@@ -81,6 +81,9 @@ class Assets {
 	 * Enqueue cart scripts.
 	 */
 	private function enqueue_cart_assets() {
+		$is_product_page = is_product();
+		$product         = $is_product_page ? wc_get_product( get_the_ID() ) : null;
+
 		$params = array(
 			'ajax'            => array(
 				'get_payload'   => array(
@@ -99,7 +102,11 @@ class Assets {
 					'method' => 'POST',
 				),
 			),
-			'is_product_page' => is_product(),
+			'is_product_page' => $is_product_page,
+			'product'         => $is_product_page ? array(
+				'id'   => $product->get_id(),
+				'type' => $product->get_type(),
+			) : null,
 			'client_key'      => $this->settings->get_credentials_secret(),
 			'theme'           => $this->settings->get_theme(),
 			'shape'           => $this->settings->get_shape(),
