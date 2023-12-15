@@ -56,14 +56,24 @@ class Assets {
 		wp_register_script( 'klarnapayments', 'https://x.klarnacdn.net/kp/lib/v1/api.js', array(), null, true ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
 
 		wp_register_script( 'kec-cart', $this->assets_path . 'js/kec-cart.js', array(), KlarnaExpressCheckout::VERSION, true );
+		wp_register_script( 'kec-checkout', $this->assets_path . 'js/kec-checkout.js', array(), KlarnaExpressCheckout::VERSION, true );
 	}
 
 	/**
 	 * Enqueue scripts.
 	 */
 	public function enqueue_assets() {
-		if ( is_cart() ) {
+		// If KEC is not enabled, return.
+		if ( ! $this->settings->is_enabled() ) {
+			return;
+		}
+
+		if ( is_cart() || is_product() ) {
 			$this->enqueue_cart_assets();
+		}
+
+		if ( is_checkout() ) {
+			$this->enqueue_checkout_assets();
 		}
 	}
 
@@ -72,7 +82,7 @@ class Assets {
 	 */
 	private function enqueue_cart_assets() {
 		$params = array(
-			'ajax'       => array(
+			'ajax'            => array(
 				'get_payload'   => array(
 					'url'    => \WC_AJAX::get_endpoint( 'kec_get_payload' ),
 					'nonce'  => wp_create_nonce( 'kec_get_payload' ),
@@ -83,10 +93,16 @@ class Assets {
 					'nonce'  => wp_create_nonce( 'kec_auth_callback' ),
 					'method' => 'POST',
 				),
+				'set_cart'      => array(
+					'url'    => \WC_AJAX::get_endpoint( 'kec_set_cart' ),
+					'nonce'  => wp_create_nonce( 'kec_set_cart' ),
+					'method' => 'POST',
+				),
 			),
-			'client_key' => $this->settings->get_credentials_secret(),
-			'theme'      => $this->settings->get_theme(),
-			'shape'      => $this->settings->get_shape(),
+			'is_product_page' => is_product(),
+			'client_key'      => $this->settings->get_credentials_secret(),
+			'theme'           => $this->settings->get_theme(),
+			'shape'           => $this->settings->get_shape(),
 		);
 
 		wp_localize_script( 'kec-cart', 'kec_cart_params', $params );
@@ -97,5 +113,42 @@ class Assets {
 		// Load the Klarna Payments library script before our script.
 		wp_enqueue_script( 'klarnapayments' );
 		wp_enqueue_script( 'kec-cart' );
+	}
+
+	/**
+	 * Enqueue checkout scripts.
+	 */
+	private function enqueue_checkout_assets() {
+		$client_token = KlarnaExpressCheckout::get_client_token();
+
+		if ( empty( $client_token ) ) {
+			return;
+		}
+
+		$params = array(
+			'ajax'         => array(
+				'get_payload'       => array(
+					'url'    => \WC_AJAX::get_endpoint( 'kec_get_payload' ),
+					'nonce'  => wp_create_nonce( 'kec_get_payload' ),
+					'method' => 'POST',
+				),
+				'checkout'          => array(
+					'url'    => \WC_AJAX::get_endpoint( 'checkout' ),
+					'method' => 'POST',
+				),
+				'finalize_callback' => array(
+					'url'    => \WC_AJAX::get_endpoint( 'kec_finalize_callback' ),
+					'nonce'  => wp_create_nonce( 'kec_finalize_callback' ),
+					'method' => 'POST',
+				),
+			),
+			'client_token' => $client_token,
+		);
+
+		wp_localize_script( 'kec-checkout', 'kec_checkout_params', $params );
+
+		// Load the Klarna Payments library script before our script.
+		wp_enqueue_script( 'klarnapayments' );
+		wp_enqueue_script( 'kec-checkout' );
 	}
 }
