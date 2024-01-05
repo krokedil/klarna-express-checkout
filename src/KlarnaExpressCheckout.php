@@ -12,6 +12,13 @@ class KlarnaExpressCheckout {
 	const VERSION = '1.1.0';
 
 	/**
+	 * Reference to the Session class.
+	 *
+	 * @var Session
+	 */
+	private $session;
+
+	/**
 	 * Reference to the Assets class.
 	 *
 	 * @var Assets
@@ -54,43 +61,13 @@ class KlarnaExpressCheckout {
 	public function __construct( $options_key = 'woocommerce_klarna_payments_settings' ) {
 		$this->settings = new Settings( $options_key );
 
+		$this->session             = new Session();
 		$this->client_token_parser = new ClientTokenParser( $this->settings() );
 		$this->assets              = new Assets( $this->settings() );
 		$this->ajax                = new AJAX( $this->client_token_parser() );
 
 		add_action( 'init', array( $this, 'maybe_unhook_kp_actions' ), 15 );
 		add_action( 'woocommerce_single_product_summary', array( $this, 'add_kec_button' ), 31 );
-		add_action( 'woocommerce_thankyou', array( __CLASS__, 'unset_token' ), 1 );
-	}
-
-	/**
-	 * Set the client token to the WooCommerce session for the current cart contents only.
-	 *
-	 * @param string $token The cart token.
-	 */
-	public static function set_client_token( $token ) {
-		// Ensure session is initialized.
-		if ( ! WC()->session ) {
-			return false;
-		}
-
-		// Set the client token in a session using the cart_hash as a key.
-		WC()->session->set( 'kec_client_token', $token );
-	}
-
-	/**
-	 * Get the client token from the WooCommerce session.
-	 *
-	 * @return string|bool
-	 */
-	public static function get_client_token() {
-		// Ensure session is initialized.
-		if ( ! WC()->session ) {
-			return false;
-		}
-
-		// Get the client token from the session using the cart_hash as a key.
-		return WC()->session->get( 'kec_client_token' );
 	}
 
 	/**
@@ -103,27 +80,12 @@ class KlarnaExpressCheckout {
 	}
 
 	/**
-	 * Unset the client token from the WooCommerce session.
-	 *
-	 * @return void
-	 */
-	public static function unset_token() {
-		// Ensure session is initialized.
-		if ( ! WC()->session ) {
-			return;
-		}
-
-		WC()->session->__unset( 'kec_client_token' );
-	}
-
-
-	/**
 	 * Maybe unhook Klarna Payments actions.
 	 *
 	 * @return void
 	 */
 	public function maybe_unhook_kp_actions() {
-		$client_token = self::get_client_token();
+		$client_token = Session::get_client_token();
 		if ( empty( $client_token ) ) {
 			return;
 		}
@@ -181,6 +143,15 @@ class KlarnaExpressCheckout {
 	 */
 	public function dequeue_kp_scripts() {
 		wp_dequeue_script( 'klarna_payments' );
+	}
+
+	/**
+	 * Get the session class.
+	 *
+	 * @return Session
+	 */
+	public function session() {
+		return $this->session;
 	}
 
 	/**
