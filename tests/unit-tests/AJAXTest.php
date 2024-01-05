@@ -41,6 +41,15 @@ class AJAXTest extends TestCase {
 		WP_Mock::assertHooksAdded();
 	}
 
+	public function testCanSetFinalizeCallback() {
+		$callable = function () {
+			return 'test';
+		};
+
+		$this->ajax->set_finalize_callback( $callable );
+		$this->assertEquals( $callable, $this->ajax->finalize_callback );
+	}
+
 	public function testKecGetPayload() {
 		// No assertions will run, but WP_Mock will fail if the function is not called properly.
 		$this->expectNotToPerformAssertions();
