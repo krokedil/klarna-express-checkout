@@ -103,6 +103,7 @@ class AJAX {
 	 * Set the cart in WooCommerce to the product KEC was initiated from.
 	 *
 	 * @return void
+	 * @codeCoverageIgnore - Cant test due to filter_input_array
 	 */
 	public function kec_set_cart() {
 		// Verify nonce.
@@ -135,6 +136,7 @@ class AJAX {
 	 * Handle the auth callback.
 	 *
 	 * @return void
+	 * @codeCoverageIgnore - Cant test due to filter_input_array
 	 */
 	public function kec_auth_callback() {
 		// Verify nonce.
@@ -182,6 +184,7 @@ class AJAX {
 	 *
 	 * @return void
 	 * @throws \Exception If the order could not be finalized.
+	 * @codeCoverageIgnore - Cant test due to filter_input_array
 	 */
 	public function kec_finalize_callback() {
 		// Verify nonce.
@@ -227,6 +230,7 @@ class AJAX {
 	 * Set the customer address.
 	 *
 	 * @param array $klarna_address The Klarna address.
+	 * @codeCoverageIgnore - Only runs external code.
 	 */
 	private function set_customer_address( $klarna_address ) {
 		// Set the billing and shipping address to the current customer for the checkout.
