@@ -43,13 +43,13 @@
             "phpcbf --standard=phpcs.xml --extensions=php --ignore=vendor/,tests/"
         ],
         "test": [
-            "phpunit --configuration phpunit.xml"
+            "@php ./vendor/bin/phpunit --configuration phpunit.xml"
         ],
         "test-coverage-html": [
-            "phpunit --configuration phpunit.xml --coverage-html coverage"
+            "@php ./vendor/bin/phpunit --configuration phpunit.xml --coverage-html coverage"
         ],
         "test-coverage-clover": [
-            "phpunit --configuration phpunit.xml --coverage-clover coverage.xml"
+            "@php ./vendor/bin/phpunit --configuration phpunit.xml --coverage-clover coverage.xml"
         ]
     },
     "config": {
