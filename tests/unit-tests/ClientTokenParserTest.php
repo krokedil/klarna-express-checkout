@@ -13,6 +13,10 @@ class ClientTokenParserTest extends TestCase {
 		$this->client_token_parser = new ClientTokenParser( $settings );
 	}
 
+	public function tearDown(): void {
+		unset( $this->client_token_parser );
+	}
+
 	public function testParseToken() {
 		// Dummy token with headers alg, typ. And payload with keys type, iat, exp.
 		$token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXkiOiJrZXkiLCJ0eXBlIjoiY2xpZW50IiwiaWF0IjoxNTg0NjQ0NjQ3LCJleHAiOjE1ODQ2NDQ3MDd9.zsXVi7hgzqT8rEtSFcaiVHKPlaymT6x1GdObIP4V4_4';
