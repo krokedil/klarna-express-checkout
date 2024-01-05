@@ -9,7 +9,27 @@ class SettingsTest extends TestCase {
 	private $settings;
 
 	public function setUp(): void {
+		parent::setUp();
+		WP_Mock::userFunction( 'get_option' )
+			->with( 'test_key', array() )
+			->andReturn(
+				array(
+					'kec_enabled'            => 'yes',
+					'kec_credentials_secret' => 'test_credentials_secret',
+					'kec_theme'              => 'default',
+					'kec_shape'              => 'default',
+				)
+			);
 		$this->settings = new Settings( 'test_key' );
+	}
+
+	public function tearDown(): void {
+		parent::tearDown();
+		unset( $this->settings );
+	}
+
+	public function testIsEnabled() {
+		$this->assertTrue( $this->settings->is_enabled() );
 	}
 
 	public function testGetCredentialsSecret() {
