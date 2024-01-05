@@ -37,15 +37,6 @@ class Assets {
 	}
 
 	/**
-	 * Set the container selector for the Klarna Express Checkout container.
-	 *
-	 * @param string $container The container selector.
-	 */
-	public function set_container( $container ) {
-		$this->container = $container;
-	}
-
-	/**
 	 * Register scripts.
 	 */
 	public function register_assets() {
