@@ -1,5 +1,24 @@
 jQuery(function ($) {
   const kec_checkout = {
+    addressFields: [
+      "#billing_first_name",
+      "#billing_last_name",
+      "#billing_address_1",
+      "#billing_address_2",
+      "#billing_city",
+      "#billing_state",
+      "#billing_postcode",
+      "#billing_country",
+      "#shipping_first_name",
+      "#shipping_last_name",
+      "#shipping_address_1",
+      "#shipping_address_2",
+      "#shipping_city",
+      "#shipping_state",
+      "#shipping_postcode",
+      "#shipping_country",
+    ],
+
     /**
      * Initialize the Klarna Express Checkout button.
      */
@@ -15,6 +34,13 @@ jQuery(function ($) {
 
       // Add on place order listener.
       $(document.body).on("click", "#place_order", kec_checkout.onPlaceOrder);
+
+      // Add listeners to address fields set by KEC.
+      $(document.body).on(
+        "change",
+        kec_checkout.addressFields.join(", "),
+        kec_checkout.onAddressChange
+      );
     },
 
     /**
@@ -68,6 +94,21 @@ jQuery(function ($) {
       Klarna.Payments.finalize({}, payload, (res) =>
         kec_checkout.onFinalizeHandler(res, orderId, orderKey)
       );
+    },
+
+    /**
+     * Handle address change.
+     *
+     * @param {object} event
+     */
+    onAddressChange(event) {
+      // Only do this if Klarna Payments is selected.
+      if (!kec_checkout.kpSelected()) {
+        return;
+      }
+
+      // Trigger an update of the checkout.
+      $("body").trigger("update_checkout");
     },
 
     /**
@@ -205,12 +246,7 @@ jQuery(function ($) {
         },
         async: false,
         success: function (response) {
-          if (response.success) {
-            finalizeResult = response.data || false;
-          } else {
-            kec_checkout.onCheckoutError(response.data || "Checkout error");
-            return false;
-          }
+          finalizeResult = response;
         },
       });
 
@@ -223,6 +259,8 @@ jQuery(function ($) {
      * @param {object} response The response from Klarna.
      * @param {string} orderId The order id.
      * @param {string} orderKey The order key.
+     *
+     * @returns {void}
      */
     onFinalizeHandler(response, orderId, orderKey) {
       if (response.approved) {
@@ -232,9 +270,18 @@ jQuery(function ($) {
           orderKey
         );
 
+        // If we have an error, display it and return.
+        if (!finalizeResult.success) {
+          const messages =
+            '<div class="woocommerce-error">Klarna payment was not approved.</div>';
+          kec_checkout.onCheckoutError(messages);
+          return;
+        }
+
+        const data = finalizeResult.data;
         // Redirect to the redirect url from the result.
-        if (finalizeResult && finalizeResult.redirect) {
-          window.location.href = finalizeResult.redirect;
+        if (data && data.redirect) {
+          window.location.href = data.redirect;
         }
       } else {
         const messages =
