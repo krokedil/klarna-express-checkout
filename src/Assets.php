@@ -126,7 +126,7 @@ class Assets {
 	 * Enqueue checkout scripts.
 	 */
 	private function enqueue_checkout_assets() {
-		$client_token = KlarnaExpressCheckout::get_client_token();
+		$client_token = Session::get_client_token();
 
 		if ( empty( $client_token ) ) {
 			return;

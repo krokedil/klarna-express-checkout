@@ -168,7 +168,8 @@ class AJAX {
 		$klarna_address = $result['collected_shipping_address'];
 
 		$this->set_customer_address( $klarna_address );
-		KlarnaExpressCheckout::set_client_token( $client_token );
+		Session::set_client_token( $client_token );
+		Session::set_klarna_address( $klarna_address );
 
 		do_action( 'kec_auth_callback_processed', $result );
 
