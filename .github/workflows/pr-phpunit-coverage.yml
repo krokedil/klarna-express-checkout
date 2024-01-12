@@ -22,7 +22,7 @@ jobs:
         coverage: xdebug
 
     - name: Install Dependencies
-      run: composer install
+      run: composer update
 
     - name: Run PHPUnit Tests with Coverage
       run: ./vendor/bin/phpunit --configuration phpunit.xml --coverage-clover=coverage.xml
