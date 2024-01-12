@@ -120,6 +120,11 @@ class Settings {
 	 * @return array
 	 */
 	public function get_setting_fields() {
+		$portal_live_link = '<a href="https://portal.klarna.com/" target="_blank">' . __( 'here for production', 'klarna-express-checkout' ) . '</a>';
+		$portal_test_link = '<a href="https://portal.playground.klarna.com/" target="_blank">' . __( 'here for playground', 'klarna-express-checkout' ) . '</a>';
+		// translators: %1$s is the link to the Klarna Merchant Portal for production, %2$s is the link to the Klarna Merchant Portal for playground.
+		$credentials_secret_desc = sprintf( __( 'Enter your Klarna Client Identifier. This can be found in the Klarna Merchant Portal %1$s and %2$s.', 'klarna-express-checkout' ), $portal_live_link, $portal_test_link );
+
 		return array(
 			'kec_settings'           => array(
 				'title' => __( 'Klarna Express Checkout', 'klarna-express-checkout' ),
@@ -133,37 +138,37 @@ class Settings {
 				'default' => 'no',
 			),
 			'kec_credentials_secret' => array(
-				'title'             => __( 'Credentials Secret', 'klarna-express-checkout' ),
+				'title'             => __( 'Klarna Client Identifier', 'klarna-express-checkout' ),
 				'type'              => 'text',
-				'desc'              => __( 'Enter your Klarna Credentials Secret. This can be found in the Klarna Merchant Portal.', 'klarna-express-checkout' ),
-				'desc_tip'          => true,
+				'description'       => $credentials_secret_desc,
+				'desc_tip'          => false,
 				'custom_attributes' => array(
 					'required' => 'required',
 				),
 			),
 			'kec_theme'              => array(
-				'title'    => __( 'Theme', 'klarna-express-checkout' ),
-				'type'     => 'select',
-				'desc'     => __( 'Select the theme for the Klarna Express Checkout.', 'klarna-express-checkout' ),
-				'desc_tip' => true,
-				'options'  => array(
+				'title'       => __( 'Theme', 'klarna-express-checkout' ),
+				'type'        => 'select',
+				'description' => __( 'Select the theme for the Klarna Express Checkout.', 'klarna-express-checkout' ),
+				'desc_tip'    => false,
+				'options'     => array(
 					'default' => __( 'Default', 'klarna-express-checkout' ),
 					'dark'    => __( 'Dark', 'klarna-express-checkout' ),
 					'light'   => __( 'Light', 'klarna-express-checkout' ),
 				),
-				'default'  => 'default',
+				'default'     => 'default',
 			),
 			'kec_shape'              => array(
-				'title'    => __( 'Shape', 'klarna-express-checkout' ),
-				'type'     => 'select',
-				'desc'     => __( 'Select the shape for the Klarna Express Checkout.', 'klarna-express-checkout' ),
-				'desc_tip' => true,
-				'options'  => array(
+				'title'       => __( 'Shape', 'klarna-express-checkout' ),
+				'type'        => 'select',
+				'description' => __( 'Select the shape for the Klarna Express Checkout.', 'klarna-express-checkout' ),
+				'desc_tip'    => false,
+				'options'     => array(
 					'default' => __( 'Default', 'klarna-express-checkout' ),
 					'rect'    => __( 'Rectangular', 'klarna-express-checkout' ),
 					'pill'    => __( 'Pill', 'klarna-express-checkout' ),
 				),
-				'default'  => 'default',
+				'default'     => 'default',
 			),
 		);
 	}
