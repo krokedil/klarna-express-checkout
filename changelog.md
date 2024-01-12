@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ------------------
 
+## [1.2.0] - 2024-01-12
+### Added
+
+* Added handling to switch to Klarna Payments normal flow away from Klarna Express Checkout on a change to the shipping address in the checkout.
+
+### Changed
+
+* Changed the name of the Credentials Secret setting to Klarna Client Identifier and added links to the merchant portal where they can be found.
+
 ## [1.1.0] - 2023-12-15
 
 ### Added
