@@ -138,13 +138,10 @@ class Settings {
 				'default' => 'no',
 			),
 			'kec_credentials_secret' => array(
-				'title'             => __( 'Klarna Client Identifier', 'klarna-express-checkout' ),
-				'type'              => 'text',
-				'description'       => $credentials_secret_desc,
-				'desc_tip'          => false,
-				'custom_attributes' => array(
-					'required' => 'required',
-				),
+				'title'       => __( 'Klarna Client Identifier', 'klarna-express-checkout' ),
+				'type'        => 'text',
+				'description' => $credentials_secret_desc,
+				'desc_tip'    => false,
 			),
 			'kec_theme'              => array(
 				'title'       => __( 'Theme', 'klarna-express-checkout' ),
