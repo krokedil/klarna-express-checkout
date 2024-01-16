@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ------------------
 
+## [1.2.1] - 2024-01-16
+### Fix
+
+* Removed the required flag from the Credentials Secret setting as it is not required.
+
 ## [1.2.0] - 2024-01-12
 ### Added
 
