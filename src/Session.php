@@ -87,6 +87,8 @@ class Session {
 	 * @return bool
 	 */
 	private static function verify_address_field( $wc_field, $klarna_field, $posted_data, $klarna_address, $ship_to_different_address ) {
+		$check_shipping_address = get_option( 'woocommerce_ship_to_destination' ) === 'billing_only' ? false : true;
+
 		$billing_value  = isset( $posted_data[ 'billing_' . $wc_field ] ) ? $posted_data[ 'billing_' . $wc_field ] : '';
 		$shipping_value = isset( $posted_data[ 'shipping_' . $wc_field ] ) ? $posted_data[ 'shipping_' . $wc_field ] : '';
 		$klarna_value   = isset( $klarna_address[ $klarna_field ] ) ? $klarna_address[ $klarna_field ] : '';
@@ -96,7 +98,7 @@ class Session {
 		$shipping_value = html_entity_decode( $shipping_value );
 		$klarna_value   = html_entity_decode( $klarna_value );
 
-		if ( $shipping_value !== $klarna_value ) {
+		if ( $check_shipping_address && $shipping_value !== $klarna_value ) {
 			// Ignore the check if the shipping field is email or phone and the value is empty.
 			if ( in_array( $wc_field, array( 'email', 'phone' ), true ) && empty( $shipping_value ) ) {
 				return true;
