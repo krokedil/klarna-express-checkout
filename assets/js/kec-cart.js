@@ -21,7 +21,7 @@ jQuery(function ($) {
      * @returns {void}
      */
     load() {
-      const { client_key, theme, shape } = kec_cart_params;
+      const { client_key, theme, shape, locale } = kec_cart_params;
 
       if (!kec_cart.checkVariation()) {
         return;
@@ -33,6 +33,7 @@ jQuery(function ($) {
         container: "#kec-pay-button",
         theme: theme,
         shape: shape,
+        locale: locale,
         on_click: (authorize) => {
           kec_cart.onClickHandler(authorize);
         },
