@@ -9,7 +9,7 @@ defined( 'ABSPATH' ) || exit;
  * @package Krokedil\KlarnaExpressCheckout
  */
 class KlarnaExpressCheckout {
-	const VERSION = '1.2.1';
+	const VERSION = '1.3.0';
 
 	/**
 	 * Reference to the Session class.
@@ -57,13 +57,14 @@ class KlarnaExpressCheckout {
 	 * KlarnaExpressCheckout constructor.
 	 *
 	 * @param string $options_key The option key to get the KEC settings from.
+	 * @param string $locale      The locale to use for the KEC integration. Defaults to using the browser locale.
 	 */
-	public function __construct( $options_key = 'woocommerce_klarna_payments_settings' ) {
+	public function __construct( $options_key = 'woocommerce_klarna_payments_settings', $locale = false ) {
 		$this->settings = new Settings( $options_key );
 
 		$this->session             = new Session();
 		$this->client_token_parser = new ClientTokenParser( $this->settings() );
-		$this->assets              = new Assets( $this->settings() );
+		$this->assets              = new Assets( $this->settings(), $locale );
 		$this->ajax                = new AJAX( $this->client_token_parser() );
 
 		add_action( 'init', array( $this, 'maybe_unhook_kp_actions' ), 15 );

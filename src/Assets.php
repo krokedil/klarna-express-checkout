@@ -24,13 +24,22 @@ class Assets {
 	private $settings;
 
 	/**
+	 * The Locale to use for the KEC integration.
+	 *
+	 * @var string|bool
+	 */
+	private $locale;
+
+	/**
 	 * Assets constructor.
 	 *
-	 * @param Settings $settings The credentials secret from Klarna for KEC.
+	 * @param Settings    $settings The credentials secret from Klarna for KEC.
+	 * @param string|bool $locale   The locale to use for the KEC integration. Defaults to using the browser locale. Optional.
 	 */
-	public function __construct( $settings ) {
+	public function __construct( $settings, $locale = false ) {
 		$this->assets_path = plugin_dir_url( __FILE__ ) . '../assets/';
 		$this->settings    = $settings;
+		$this->locale      = $locale;
 
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ), 15 );
@@ -101,6 +110,7 @@ class Assets {
 			'client_key'      => $this->settings->get_credentials_secret(),
 			'theme'           => $this->settings->get_theme(),
 			'shape'           => $this->settings->get_shape(),
+			'locale'          => $this->locale,
 		);
 
 		wp_localize_script( 'kec-cart', 'kec_cart_params', $params );

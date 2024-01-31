@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ------------------
 
+## [1.3.0] - 2024-01-31
+### Added
+
+* Added support for passing locale to the KEC initialization.
+
 ## [1.2.1] - 2024-01-16
 ### Fix
 
