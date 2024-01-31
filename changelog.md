@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Added support for passing locale to the KEC initialization.
 
+### Fix
+
+* We will no longer test against shipping address when the delivery address is forced to be the billing address.
+
 ## [1.2.1] - 2024-01-16
 ### Fix
 
