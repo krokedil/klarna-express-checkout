@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fix
+
+* Fixed an issue where a new KEC button would be created on a variation product every time the customer selected a variation option. 
+
 ------------------
 
 ## [1.3.0] - 2024-01-31
