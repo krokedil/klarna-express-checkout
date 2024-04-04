@@ -27,6 +27,11 @@ jQuery(function ($) {
         return;
       }
 
+      // Check if the button already exist.
+      if (null !== document.querySelector('#kec-pay-button').shadowRoot) {
+        return;
+      }
+
       window.Klarna.Payments.Buttons.init({
         client_id,
       }).load({
