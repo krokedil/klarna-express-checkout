@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fix
+
+* Moved from client_key to client_id as the former has now been deprecated by Klarna.
+
 ------------------
 
 ## [1.3.0] - 2024-01-31
