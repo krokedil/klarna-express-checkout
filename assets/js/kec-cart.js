@@ -21,7 +21,7 @@ jQuery(function ($) {
      * @returns {void}
      */
     load() {
-      const { client_key, theme, shape, locale } = kec_cart_params;
+      const { client_id, theme, shape, locale } = kec_cart_params;
 
       if (!kec_cart.checkVariation()) {
         return;
@@ -33,7 +33,7 @@ jQuery(function ($) {
       }
 
       window.Klarna.Payments.Buttons.init({
-        client_key: client_key,
+        client_id,
       }).load({
         container: "#kec-pay-button",
         theme: theme,
