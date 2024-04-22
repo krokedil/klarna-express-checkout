@@ -107,7 +107,7 @@ class Assets {
 				'id'   => $product->get_id(),
 				'type' => $product->get_type(),
 			) : null,
-			'client_key'      => $this->settings->get_credentials_secret(),
+			'client_id'       => $this->settings->get_credentials_secret(),
 			'theme'           => $this->settings->get_theme(),
 			'shape'           => $this->settings->get_shape(),
 			'locale'          => $this->locale,
