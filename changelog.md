@@ -7,12 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+------------------
+## [1.3.1] - 2024-04-22
 ### Fix
 
 * Fixed an issue where a new KEC button would be created on a variation product every time the customer selected a variation option. 
 * Moved from client_key to client_id as the former has now been deprecated by Klarna.
-
-------------------
 
 ## [1.3.0] - 2024-01-31
 ### Added
