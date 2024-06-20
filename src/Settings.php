@@ -93,6 +93,10 @@ class Settings {
 	 * @return string
 	 */
 	public function get_credentials_secret() {
+		if ( function_exists( 'kp_get_client_id' ) ) {
+			return kp_get_client_id();
+		}
+
 		return $this->options['kec_credentials_secret'] ?? '';
 	}
 
@@ -120,34 +124,34 @@ class Settings {
 	 * @return array
 	 */
 	public function get_setting_fields() {
-		$portal_live_link = '<a href="https://portal.klarna.com/" target="_blank">' . __( 'here for production', 'klarna-express-checkout' ) . '</a>';
-		$portal_test_link = '<a href="https://portal.playground.klarna.com/" target="_blank">' . __( 'here for playground', 'klarna-express-checkout' ) . '</a>';
-		// translators: %1$s is the link to the Klarna Merchant Portal for production, %2$s is the link to the Klarna Merchant Portal for playground.
-		$credentials_secret_desc = sprintf( __( 'Enter your Klarna Client Identifier. This can be found in the Klarna Merchant Portal %1$s and %2$s.', 'klarna-express-checkout' ), $portal_live_link, $portal_test_link );
-
 		return array(
-			'kec_settings'           => array(
-				'title' => __( 'Klarna Express Checkout', 'klarna-express-checkout' ),
-				'type'  => 'title',
-				'desc'  => __( 'Klarna Express Checkout is a fast and easy way for customers to pay with Klarna.', 'klarna-express-checkout' ),
+			'kec_settings' => array(
+				'id'          => 'kec_settings',
+				'title'       => 'Express Checkout',
+				'description' => __( 'An improved way to drive shoppers straight to the checkout, with all their preferences already set.', 'klarna-express-checkout' ),
+				'links'       => array(
+					array(
+						'url'   => 'https://docs.klarna.com/express-checkout/',
+						'title' => __( 'Learn more', 'klarna-express-checkout' ),
+					),
+					array(
+						'url'   => 'https://docs.klarna.com/express-checkout/',
+						'title' => __( 'Documentation', 'klarna-express-checkout' ),
+					),
+				),
+				'type'        => 'kp_section_start',
 			),
-			'kec_enabled'            => array(
+			'kec_enabled'  => array(
 				'title'   => __( 'Enable/Disable', 'klarna-express-checkout' ),
 				'type'    => 'checkbox',
 				'label'   => __( 'Enable Klarna Express Checkout', 'klarna-express-checkout' ),
 				'default' => 'no',
 			),
-			'kec_credentials_secret' => array(
-				'title'       => __( 'Klarna Client Identifier', 'klarna-express-checkout' ),
-				'type'        => 'text',
-				'description' => $credentials_secret_desc,
-				'desc_tip'    => false,
-			),
-			'kec_theme'              => array(
+			'kec_theme'    => array(
 				'title'       => __( 'Theme', 'klarna-express-checkout' ),
 				'type'        => 'select',
 				'description' => __( 'Select the theme for the Klarna Express Checkout.', 'klarna-express-checkout' ),
-				'desc_tip'    => false,
+				'desc_tip'    => true,
 				'options'     => array(
 					'default' => __( 'Default', 'klarna-express-checkout' ),
 					'dark'    => __( 'Dark', 'klarna-express-checkout' ),
@@ -155,17 +159,26 @@ class Settings {
 				),
 				'default'     => 'default',
 			),
-			'kec_shape'              => array(
+			'kec_shape'    => array(
 				'title'       => __( 'Shape', 'klarna-express-checkout' ),
 				'type'        => 'select',
 				'description' => __( 'Select the shape for the Klarna Express Checkout.', 'klarna-express-checkout' ),
-				'desc_tip'    => false,
+				'desc_tip'    => true,
 				'options'     => array(
 					'default' => __( 'Default', 'klarna-express-checkout' ),
 					'rect'    => __( 'Rectangular', 'klarna-express-checkout' ),
 					'pill'    => __( 'Pill', 'klarna-express-checkout' ),
 				),
 				'default'     => 'default',
+			),
+			'kec_end'      => array(
+				'type'     => 'kp_section_end',
+				'previews' => array(
+					array(
+						'title' => __( 'Preview', 'klarna-express-checkout' ),
+						'image' => WC_KLARNA_PAYMENTS_PLUGIN_URL . '/assets/img/kp-general-preview.png',
+					),
+				),
 			),
 		);
 	}
