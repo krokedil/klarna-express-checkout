@@ -127,6 +127,11 @@ class KlarnaExpressCheckout {
 			return;
 		}
 
+		// Skip if we should only show the button on the cart page.
+		if ( 'cart' === $this->settings()->get_placements() ) {
+			return;
+		}
+
 		// Ensure we only do this once per page load.
 		if ( did_action( 'woocommerce_single_product_summary' ) > 1 ) {
 			return;
