@@ -75,6 +75,7 @@ class Settings {
 			'kec_credentials_secret' => $settings['kec_credentials_secret'] ?? '',
 			'kec_theme'              => $settings['kec_theme'] ?? 'default',
 			'kec_shape'              => $settings['kec_shape'] ?? 'default',
+			'kec_placement'          => $settings['kec_placement'] ?? 'both',
 		);
 	}
 
@@ -119,21 +120,26 @@ class Settings {
 	}
 
 	/**
+	 * Get the placements for the Klarna Express Checkout.
+	 *
+	 * @return string
+	 */
+	public function get_placements() {
+		return $this->options['kec_placement'] ?? 'both';
+	}
+
+	/**
 	 * Get the setting fields.
 	 *
 	 * @return array
 	 */
 	public function get_setting_fields() {
 		return array(
-			'kec_settings' => array(
+			'kec_settings'  => array(
 				'id'          => 'kec_settings',
 				'title'       => 'Express Checkout',
-				'description' => __( 'An improved way to drive shoppers straight to the checkout, with all their preferences already set.', 'klarna-express-checkout' ),
+				'description' => __( 'Offer a faster check-out process that will lower the threshold for shoppers to complete a purchase.', 'klarna-express-checkout' ),
 				'links'       => array(
-					array(
-						'url'   => 'https://docs.klarna.com/express-checkout/',
-						'title' => __( 'Learn more', 'klarna-express-checkout' ),
-					),
 					array(
 						'url'   => 'https://docs.klarna.com/express-checkout/',
 						'title' => __( 'Documentation', 'klarna-express-checkout' ),
@@ -141,45 +147,83 @@ class Settings {
 				),
 				'type'        => 'kp_section_start',
 			),
-			'kec_enabled'  => array(
+			'kec_enabled'   => array(
 				'title'   => __( 'Enable/Disable', 'klarna-express-checkout' ),
 				'type'    => 'checkbox',
 				'label'   => __( 'Enable Klarna Express Checkout', 'klarna-express-checkout' ),
 				'default' => 'no',
 			),
-			'kec_theme'    => array(
+			'kec_info'      => array(
+				'type'        => 'kp_text_info',
+				'title'       => __( 'Placements & button style', 'klarna-express-checkout' ),
+				'description' => __( 'Tailor the express checkout button to fit your brand by adjusting the button theme, shape and selecting placements.', 'klarna-express-checkout' ),
+			),
+			'kec_theme'     => array(
 				'title'       => __( 'Theme', 'klarna-express-checkout' ),
 				'type'        => 'select',
 				'description' => __( 'Select the theme for the Klarna Express Checkout.', 'klarna-express-checkout' ),
 				'desc_tip'    => true,
 				'options'     => array(
-					'default' => __( 'Default', 'klarna-express-checkout' ),
-					'dark'    => __( 'Dark', 'klarna-express-checkout' ),
-					'light'   => __( 'Light', 'klarna-express-checkout' ),
+					'default'  => __( 'Default', 'klarna-express-checkout' ),
+					'dark'     => __( 'Dark', 'klarna-express-checkout' ),
+					'light'    => __( 'Light', 'klarna-express-checkout' ),
+					'outlined' => __( 'Outlined', 'klarna-express-checkout' ),
 				),
 				'default'     => 'default',
 			),
-			'kec_shape'    => array(
+			'kec_shape'     => array(
 				'title'       => __( 'Shape', 'klarna-express-checkout' ),
 				'type'        => 'select',
 				'description' => __( 'Select the shape for the Klarna Express Checkout.', 'klarna-express-checkout' ),
 				'desc_tip'    => true,
 				'options'     => array(
-					'default' => __( 'Default', 'klarna-express-checkout' ),
+					'default' => __( 'Rounded', 'klarna-express-checkout' ),
 					'rect'    => __( 'Rectangular', 'klarna-express-checkout' ),
 					'pill'    => __( 'Pill', 'klarna-express-checkout' ),
 				),
 				'default'     => 'default',
 			),
-			'kec_end'      => array(
+			'kec_placement' => array(
+				'title'   => __( 'Placements', 'klarna-express-checkout' ),
+				'type'    => 'select',
+				'default' => 'both',
+				'options' => array(
+					'both'    => __( 'All (recommended)', 'klarna-express-checkout' ),
+					'product' => __( 'Product pages', 'klarna-express-checkout' ),
+					'cart'    => __( 'Cart page', 'klarna-express-checkout' ),
+				),
+			),
+			'kec_end'       => array(
 				'type'     => 'kp_section_end',
 				'previews' => array(
 					array(
 						'title' => __( 'Preview', 'klarna-express-checkout' ),
-						'image' => WC_KLARNA_PAYMENTS_PLUGIN_URL . '/assets/img/kp-general-preview.png',
+						'image' => $this->get_preview_img_url(),
 					),
 				),
 			),
 		);
+	}
+
+	/**
+	 * Get the preview image url.
+	 *
+	 * @return string
+	 */
+	public function get_preview_img_url() {
+		$shape = $this->get_shape();
+		$theme = $this->get_theme();
+
+		if ( '' === $shape ) {
+			$shape = 'default';
+		}
+
+		if ( '' === $theme || 'custom' === $theme || 'dark' === $theme ) {
+			$theme = 'default';
+		}
+
+		$preview_img = Assets::get_assets_path() . 'img/preview-' . $shape . '-' . $theme . '.png';
+
+		return $preview_img;
 	}
 }
