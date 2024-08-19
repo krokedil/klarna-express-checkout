@@ -37,12 +37,21 @@ class Assets {
 	 * @param string|bool $locale   The locale to use for the KEC integration. Defaults to using the browser locale. Optional.
 	 */
 	public function __construct( $settings, $locale = false ) {
-		$this->assets_path = plugin_dir_url( __FILE__ ) . '../assets/';
+		$this->assets_path = self::get_assets_path();
 		$this->settings    = $settings;
 		$this->locale      = $locale;
 
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ), 15 );
+	}
+
+	/**
+	 * Get the assets folder path.
+	 *
+	 * @return string
+	 */
+	public static function get_assets_path() {
+		return plugin_dir_url( __DIR__ ) . 'assets/';
 	}
 
 	/**
