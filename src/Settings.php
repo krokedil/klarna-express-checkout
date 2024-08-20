@@ -73,7 +73,7 @@ class Settings {
 		return array(
 			'kec_enabled'            => $settings['kec_enabled'] ?? 'no',
 			'kec_credentials_secret' => $settings['kec_credentials_secret'] ?? '',
-			'kec_theme'              => $settings['kec_theme'] ?? 'default',
+			'kec_theme'              => $settings['kec_theme'] ?? 'dark',
 			'kec_shape'              => $settings['kec_shape'] ?? 'default',
 			'kec_placement'          => $settings['kec_placement'] ?? 'both',
 		);
@@ -107,7 +107,7 @@ class Settings {
 	 * @return string
 	 */
 	public function get_theme() {
-		return $this->options['kec_theme'] ?? 'default';
+		return $this->options['kec_theme'] ?? 'dark';
 	}
 
 	/**
@@ -164,12 +164,11 @@ class Settings {
 				'description' => __( 'Select the theme for the Klarna Express Checkout.', 'klarna-express-checkout' ),
 				'desc_tip'    => true,
 				'options'     => array(
-					'default'  => __( 'Default', 'klarna-express-checkout' ),
 					'dark'     => __( 'Dark', 'klarna-express-checkout' ),
 					'light'    => __( 'Light', 'klarna-express-checkout' ),
 					'outlined' => __( 'Outlined', 'klarna-express-checkout' ),
 				),
-				'default'     => 'default',
+				'default'     => 'dark',
 			),
 			'kec_shape'     => array(
 				'title'       => __( 'Shape', 'klarna-express-checkout' ),
@@ -218,8 +217,8 @@ class Settings {
 			$shape = 'default';
 		}
 
-		if ( '' === $theme || 'custom' === $theme || 'dark' === $theme ) {
-			$theme = 'default';
+		if ( '' === $theme || 'default' === $theme ) {
+			$theme = 'dark';
 		}
 
 		$preview_img = Assets::get_assets_path() . 'img/preview-' . $shape . '-' . $theme . '.png';
