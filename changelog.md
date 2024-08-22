@@ -6,13 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
 
+* Preview images for each of the button theme and shape combinations.
+* A new theme for the outlined version of the KEC button.
+
+### Changed
+
+* Changed the settings to match the new layout and structure for the Klarna Payments plugins settings pages. Changed the WooCommerce settings API section start and end to be of the types `kp_section_start` and `kp_section_end` respectively.
+
+### Removed
+
+* Removed the setting for the Client ID from the package, and instead uses the new `kp_get_client_id` function from Klarna Payments to get the client id based on the customers country and availability.
+* Removed the default theme option, since this was just a different name for the dark theme.
 
 ------------------
 ## [1.3.1] - 2024-04-22
 ### Fix
 
-* Fixed an issue where a new KEC button would be created on a variation product every time the customer selected a variation option. 
+* Fixed an issue where a new KEC button would be created on a variation product every time the customer selected a variation option.
 * Moved from client_key to client_id as the former has now been deprecated by Klarna.
 
 ## [1.3.0] - 2024-01-31
