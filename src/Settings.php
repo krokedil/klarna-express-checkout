@@ -94,8 +94,8 @@ class Settings {
 	 * @return string
 	 */
 	public function get_credentials_secret() {
-		if ( function_exists( 'kp_get_client_id' ) ) {
-			return kp_get_client_id();
+		if ( function_exists( 'kp_get_client_id_by_currency' ) ) {
+			return kp_get_client_id_by_currency();
 		}
 
 		return $this->options['kec_credentials_secret'] ?? '';
