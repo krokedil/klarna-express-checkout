@@ -93,6 +93,12 @@ class Assets {
 		$is_product_page = is_product();
 		$product         = $is_product_page ? wc_get_product( get_the_ID() ) : null;
 
+		$client_id = $this->settings->get_credentials_secret();
+
+		if ( empty( $client_id ) ) { // Skip if we don't have a client ID.
+			return;
+		}
+
 		$params = array(
 			'ajax'            => array(
 				'get_payload'   => array(
@@ -116,7 +122,7 @@ class Assets {
 				'id'   => $product->get_id(),
 				'type' => $product->get_type(),
 			) : null,
-			'client_id'       => $this->settings->get_credentials_secret(),
+			'client_id'       => $client_id,
 			'theme'           => $this->settings->get_theme(),
 			'shape'           => $this->settings->get_shape(),
 			'locale'          => $this->locale,
