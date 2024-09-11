@@ -122,13 +122,25 @@ class KlarnaExpressCheckout {
 	 * @return void
 	 */
 	public function add_kec_button() {
+		global $product;
+
 		// Only show the button if KEC is enabled.
 		if ( ! $this->settings()->is_enabled() ) {
 			return;
 		}
 
+		// Skip if we should only show the button on the cart page.
+		if ( 'cart' === $this->settings()->get_placements() ) {
+			return;
+		}
+
 		// Ensure we only do this once per page load.
 		if ( did_action( 'woocommerce_single_product_summary' ) > 1 ) {
+			return;
+		}
+
+		// Only show the button if product is in stock.
+		if ( ! $product->is_in_stock() ) {
 			return;
 		}
 
