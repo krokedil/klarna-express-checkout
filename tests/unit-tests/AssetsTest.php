@@ -3,20 +3,13 @@ use Krokedil\KlarnaExpressCheckout\Assets;
 use WP_Mock\Tools\TestCase;
 
 class AssetsTest extends TestCase {
-	public function setUp(): void {
-		parent::setUp();
-	}
-
-	public function tearDown(): void {
-		parent::tearDown();
-	}
-
 	private function getAssetsInstance() {
 		$mockSettings = $this->getMockBuilder( 'Krokedil\KlarnaExpressCheckout\Settings' )
 			->disableOriginalConstructor()
 			->getMock();
 
 		$mockSettings->method( 'is_enabled' )->willReturn( true );
+		$mockSettings->method( 'get_credentials_secret' )->willReturn( 'test_credentials_secret' );
 
 		$assets = new Assets( $mockSettings );
 

@@ -3,14 +3,6 @@ use Krokedil\KlarnaExpressCheckout\Session;
 use WP_Mock\Tools\TestCase;
 
 class SessionTest extends TestCase {
-	public function setUp(): void {
-		parent::setUp();
-	}
-
-	public function tearDown(): void {
-		parent::tearDown();
-	}
-
 	public function testConstructor() {
 		// Expect actions to be added.
 		WP_Mock::expectActionAdded( 'woocommerce_checkout_update_order_review', Session::class . '::on_update_order_review' );
