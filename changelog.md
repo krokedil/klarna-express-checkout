@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+------------------
+
+## [1.4.0] - 2024-09-11
 ### Added
 
 * Preview images for each of the button theme and shape combinations.
@@ -20,7 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Removed the setting for the Client ID from the package, and instead uses the new `kp_get_client_id` function from Klarna Payments to get the client id based on the customers country and availability.
 * Removed the default theme option, since this was just a different name for the dark theme.
 
-------------------
+### Fixed
+
+* Fixed an issue with showing the Klarna Express Checkout button on the product page when the product is out of stock.
+
 ## [1.3.1] - 2024-04-22
 ### Fix
 
