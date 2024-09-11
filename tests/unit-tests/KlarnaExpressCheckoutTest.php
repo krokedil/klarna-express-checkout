@@ -112,6 +112,11 @@ class KlarnaExpressCheckoutTest extends TestCase {
 	}
 
 	public function testCanAddKecButtonOnce() {
+		global $product;
+		$mockProduct = Mockery::mock( 'overload:WC_Product' );
+		$mockProduct->shouldReceive( 'is_in_stock' )->andReturn( true );
+		$product = $mockProduct;
+
 		WP_Mock::userFunction( 'get_option' )
 			->with( 'test_key_enabled', array() )
 			->andReturn(
