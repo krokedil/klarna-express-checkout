@@ -23,10 +23,6 @@ class KlarnaExpressCheckoutTest extends TestCase {
 		parent::setUp();
 	}
 
-	public function tearDown(): void {
-		parent::tearDown();
-	}
-
 	public function testConstructor() {
 		// Create an instance of KlarnaExpressCheckout
 		$kec = new KlarnaExpressCheckout( 'test_key' );
