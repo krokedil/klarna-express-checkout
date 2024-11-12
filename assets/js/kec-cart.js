@@ -12,6 +12,7 @@ jQuery(function ($) {
       // Add event listener to the cart update button.
       $(document.body).on("updated_cart_totals", kec_cart.load);
 
+      $(document.body).on("woocommerce_variation_has_changed", kec_cart.onVariationSelectChange);
       $(document.body).on("found_variation", kec_cart.onFoundVariation);
     },
 
@@ -43,6 +44,17 @@ jQuery(function ($) {
           kec_cart.onClickHandler(authorize);
         },
       });
+    },
+
+    /**
+     * Handle the change selected variation event.
+     * If no variation is selected, the KEC button will be hidden.
+     *
+     * @returns {void}
+     */
+    onVariationSelectChange() {
+      let variationIsSelected = kec_cart.checkVariation() ? true : false;
+      $('#kec-pay-button').toggle(variationIsSelected);
     },
 
     /**

@@ -138,7 +138,7 @@ class Settings {
 			'kec_settings'  => array(
 				'id'          => 'kec_settings',
 				'title'       => 'Express Checkout',
-				'description' => __( 'Offer a faster check-out process that will lower the threshold for shoppers to complete a purchase.', 'klarna-express-checkout' ),
+				'description' => __( 'Offer a 5x faster check-out process that lowers the threshold for shoppers to complete a purchase.', 'klarna-express-checkout' ),
 				'links'       => array(
 					array(
 						'url'   => 'https://docs.klarna.com/express-checkout/',

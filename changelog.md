@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ------------------
+## [1.4.1] - 2024-11-12
+### Changed
+* The KEC button will remain hidden on a variable product page until a variant is selected.
+* Updated the product description as shown on the settings page.
 
 ## [1.4.0] - 2024-09-11
 ### Added
