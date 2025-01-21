@@ -1,6 +1,6 @@
 <?php
 function wp_json_encode( $data ) {
-	return json_encode( $data );
+	return wp_json_encode( $data );
 }
 
 function wp_create_nonce( $action ) {

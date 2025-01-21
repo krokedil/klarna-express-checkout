@@ -43,7 +43,7 @@ class SessionTest extends TestCase {
 			'field_1' => 'test_field_1',
 			'field_2' => 'test_field_2',
 		);
-		$addressJson = json_encode( $address );
+		$addressJson = wp_json_encode( $address );
 
 		$wcSession = Mockery::mock( 'overload:WC_Session_Handler' );
 		$wcSession->shouldReceive( 'set' )->with( 'kec_klarna_address', $addressJson )->once();
@@ -96,7 +96,7 @@ class SessionTest extends TestCase {
 			'field_1' => 'test_field_1',
 			'field_2' => 'test_field_2',
 		);
-		$addressJson = json_encode( $address );
+		$addressJson = wp_json_encode( $address );
 
 		$wcSession = Mockery::mock( 'overload:WC_Session_Handler' );
 		$wcSession->shouldReceive( 'get' )->with( 'kec_klarna_address', false )->andReturn( $addressJson )->once();
@@ -214,7 +214,7 @@ class SessionTest extends TestCase {
 			->once();
 		$wcSession->shouldReceive( 'get' )
 			->with( 'kec_klarna_address', false )
-			->andReturn( json_encode( $address ) )
+			->andReturn( wp_json_encode( $address ) )
 		->once();
 
 		$wcSession->shouldNotReceive( 'set' );
@@ -245,7 +245,7 @@ class SessionTest extends TestCase {
 			->once();
 		$wcSession->shouldReceive( 'get' )
 			->with( 'kec_klarna_address', false )
-			->andReturn( json_encode( $klarna_address ) )
+			->andReturn( wp_json_encode( $klarna_address ) )
 			->once();
 
 		$wcSession->shouldNotReceive( 'set' );
@@ -277,7 +277,7 @@ class SessionTest extends TestCase {
 			->once();
 		$wcSession->shouldReceive( 'get' )
 			->with( 'kec_klarna_address', false )
-			->andReturn( json_encode( $klarna_address ) )
+			->andReturn( wp_json_encode( $klarna_address ) )
 			->once();
 
 		$wcSession->shouldNotReceive( 'set' );
@@ -308,7 +308,7 @@ class SessionTest extends TestCase {
 			->once();
 		$wcSession->shouldReceive( 'get' )
 			->with( 'kec_klarna_address', false )
-			->andReturn( json_encode( $klarna_address ) )
+			->andReturn( wp_json_encode( $klarna_address ) )
 			->once();
 
 		$wcCustomer = Mockery::mock( 'overload:WC_Customer' );
@@ -343,7 +343,7 @@ class SessionTest extends TestCase {
 			->once();
 		$wcSession->shouldReceive( 'get' )
 			->with( 'kec_klarna_address', false )
-			->andReturn( json_encode( $klarna_address ) )
+			->andReturn( wp_json_encode( $klarna_address ) )
 			->once();
 
 		$wcCustomer = Mockery::mock( 'overload:WC_Customer' );
