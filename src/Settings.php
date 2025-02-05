@@ -85,6 +85,11 @@ class Settings {
 	 * @return bool
 	 */
 	public function is_enabled() {
+		$kp_unavailable_feature_ids = get_option( 'kp_unavailable_feature_ids', array() );
+		if ( in_array( 'kec_settings', $kp_unavailable_feature_ids ) ) {
+			return false;
+		}
+
 		return 'yes' === $this->options['kec_enabled'] ?? 'no';
 	}
 
