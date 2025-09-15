@@ -25,7 +25,7 @@ class SimulateWebhook extends Base {
 	 *
 	 * @return array The request body.
 	 */
-	public function get_body() {
+	public function get_request_body() {
 		return array(
 			'event_type'    => $this->arguments['event_type'] ?? '',
 			'event_version' => $this->arguments['event_version'] ?? '',
