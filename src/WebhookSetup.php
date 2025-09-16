@@ -124,11 +124,11 @@ class WebhookSetup {
 		$response = Requests::simulate_webhook( $webhook['webhook_id'], 'payment.request.state-change.submitted', 'v2' );
 
 		if ( is_wp_error( $response ) ) {
-			throw new \Exception( 'Could not send test webhook: ' . $response->get_error_message() );
+			throw new \Exception( __( 'Could not send test webhook', 'klarna-express-checkout' ) );
 		}
 
 		// Show an admin notice that the webhook was sent.
-		$this->add_message( 'Test webhook sent successfully.' );
+		$this->add_message( __( 'Test webhook sent successfully.', 'klarna-express-checkout' ) );
 	}
 
 	/**
@@ -150,7 +150,7 @@ class WebhookSetup {
 
 			// If the webhook could not be deleted, throw an exception.
 			if ( is_wp_error( $delete_webhook_response ) ) {
-				throw new \Exception( 'Could not remove webhook: ' . $delete_webhook_response->get_error_message() );
+				throw new \Exception( __( 'Could not remove webhook', 'klarna-express-checkout' ) );
 			}
 
 			delete_option( 'kec_webhook' );
@@ -161,13 +161,13 @@ class WebhookSetup {
 
 			// If the signing key could not be deleted, throw an exception.
 			if ( is_wp_error( $delete_signing_key_response ) ) {
-				throw new \Exception( 'Could not remove signing key: ' . $delete_signing_key_response->get_error_message() );
+				throw new \Exception( __( 'Could not remove signing key', 'klarna-express-checkout' ) );
 			}
 
 			delete_option( 'kec_signing_key' );
 		}
 
-		$this->add_message( 'Webhook removed successfully.' );
+		$this->add_message( __( 'Webhook removed successfully.', 'klarna-express-checkout' ) );
 	}
 
 	/**
@@ -179,7 +179,7 @@ class WebhookSetup {
 		$response = Requests::create_signing_key();
 
 		if ( is_wp_error( $response ) ) {
-			throw new \Exception( 'Could not create signing key: ' . $response->get_error_message() );
+			throw new \Exception( __( 'Could not create signing key', 'klarna-express-checkout' ) );
 		}
 
 		// Save the signing key to the options, and the options array.
@@ -208,7 +208,7 @@ class WebhookSetup {
 
 		// If we had a WP_Error, don't continue.
 		if ( is_wp_error( $signing_key ) ) {
-			throw new \Exception( 'Could not create a signing key with Klarna for the webhook.' );
+			throw new \Exception( __( 'Could not create a signing key with Klarna for the webhook.', 'klarna-express-checkout' ) );
 		}
 
 		$url           = get_rest_url( null, '/klarna/v1/kec/notifications' );
@@ -223,14 +223,14 @@ class WebhookSetup {
 		$response = Requests::create_webhook( $url, $event_types, $event_version, $signing_key['signing_key_id'] );
 
 		if( is_wp_error( $response ) ) {
-			throw new \Exception( 'Could not create webhook with Klarna' );
+			throw new \Exception( __( 'Could not create webhook with Klarna', 'klarna-express-checkout' ) );
 		}
 
 		// Update the settings with the new webhook.
 		$this->kec->settings()->update_setting( 'kec_webhook', $response );
 
 		// Show an admin notice that the webhook were created.
-		$this->add_message( 'Webhook created successfully.' );
+		$this->add_message( __( 'Webhook created successfully.', 'klarna-express-checkout' ) );
 	}
 
 	/**
