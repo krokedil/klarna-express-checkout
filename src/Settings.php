@@ -218,7 +218,7 @@ class Settings {
 			return;
 		}
 
-		$url           = get_rest_url( null, '/klarna/v1/webhooks' );
+		$url           = get_rest_url( null, '/klarna/v1/notifications' );
 		$event_types   = array(
 			'payment.request.state-change.submitted',
 			'payment.request.state-change.completed',
