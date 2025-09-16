@@ -1,6 +1,8 @@
 <?php
 namespace Krokedil\KlarnaExpressCheckout;
 
+use Krokedil\KlarnaExpressCheckout\Api\Controllers\Notifications;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -47,6 +49,13 @@ class KlarnaExpressCheckout {
 	private $settings;
 
 	/**
+	 * Reference to the WebhookSetup class.
+	 *
+	 * @var WebhookSetup
+	 */
+	private $webhook_setup;
+
+	/**
 	 * The ID of the payment button element.
 	 *
 	 * @var string
@@ -66,9 +75,13 @@ class KlarnaExpressCheckout {
 		$this->client_token_parser = new ClientTokenParser( $this->settings() );
 		$this->assets              = new Assets( $this->settings(), $locale );
 		$this->ajax                = new AJAX( $this->client_token_parser() );
+		$this->webhook_setup       = new WebhookSetup( $this );
 
 		add_action( 'init', array( $this, 'maybe_unhook_kp_actions' ), 15 );
 		add_action( 'woocommerce_single_product_summary', array( $this, 'add_kec_button' ), 31 );
+
+		// Register the API controller for handling notifications in the Klarna API.
+		$this->register_api_controller();
 	}
 
 	/**
@@ -201,5 +214,23 @@ class KlarnaExpressCheckout {
 	 */
 	public function settings() {
 		return $this->settings;
+	}
+
+	/**
+	 * Get the webhook setup class.
+	 *
+	 * @return WebhookSetup
+	 */
+	public function webhook_setup() {
+		return $this->webhook_setup;
+	}
+
+	/**
+	 * Register the API controller for handling notifications in the Klarna API.
+	 *
+	 * @return void
+	 */
+	public function register_api_controller() {
+		Notifications::register_controller();
 	}
 }
