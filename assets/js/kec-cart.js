@@ -22,8 +22,6 @@ jQuery(function ($) {
      * @returns {void}
      */
     load() {
-      const { client_id, theme, shape, locale } = kec_cart_params;
-
       if (!kec_cart.checkVariation()) {
         return;
       }
@@ -32,6 +30,26 @@ jQuery(function ($) {
       if (null !== document.querySelector('#kec-pay-button').shadowRoot) {
         return;
       }
+
+      // Wait until the window.Klarna.Payments.Buttons is available before initializing the button.
+      const interval = setInterval(() => {
+        if (window.Klarna && window.Klarna.Payments && window.Klarna.Payments.Buttons) {
+          clearInterval(interval);
+          kec_cart.initKlarnaButton();
+        }
+      }, 100);
+
+      // Stop trying to load the button after 2 seconds.
+      setTimeout(() => clearInterval(interval), 2000);
+    },
+
+    /**
+     * Initialize the Klarna button.
+     *
+     * @returns {void}
+     */
+    initKlarnaButton() {
+      const { client_id, theme, shape, locale } = kec_cart_params;
 
       window.Klarna.Payments.Buttons.init({
         client_id,
