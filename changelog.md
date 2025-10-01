@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+
+* Fixed a potential issue that could happen if we tried to initialize the KEC button before the Klarna Payments script was loaded and had registered the `Klarna.Payments.Buttons` object in the window.
 
 ------------------
 ## [1.4.1] - 2024-11-12
