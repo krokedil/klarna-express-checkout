@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+* Implemented support for One step checkout flow for AP partners using Klarna Express Checkout.
+* Added settings page output to create webhooks and signing keys for Klarna Express Checkout, needed for the one step checkout flow.
+* Added API calls to create and manage webhooks and signing keys for Klarna Express Checkout.
+* Added handling for webhook events from Klarna to handle order cancellations and completion from Klarna when using the one step checkout flow.
 
 ------------------
 ## [1.4.1] - 2024-11-12
