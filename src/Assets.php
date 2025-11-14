@@ -1,6 +1,10 @@
 <?php
 namespace Krokedil\KlarnaExpressCheckout;
 
+use KP_Assets;
+use Krokedil\Klarna\Features;
+use Krokedil\Klarna\PluginFeatures;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -60,15 +64,15 @@ class Assets {
 	 */
 	public function register_assets() {
 		// Register the style for the cart page.
-		wp_register_style( 'kec-cart', $this->assets_path . 'css/kec-cart.css', array(), KlarnaExpressCheckout::VERSION );
+		wp_register_style( 'kec-cart', "{$this->assets_path}css/kec-cart.css", array(), KlarnaExpressCheckout::VERSION );
 
-		// wp_register_script( 'kec-cart', $this->assets_path . 'js/kec-cart.js', array(), KlarnaExpressCheckout::VERSION, true );
-		// wp_register_script( 'kec-checkout', $this->assets_path . 'js/kec-checkout.js', array(), KlarnaExpressCheckout::VERSION, true );
-		wp_register_script( 'kec-one-step', "{$this->assets_path}js/kec-one-step.js", array(\KP_Assets::KP_WEBSDK_HANDLE_V2), KlarnaExpressCheckout::VERSION, true );
+		wp_register_script( 'kec-cart', "{$this->assets_path}js/kec-cart.js", array( 'jquery', 'klarnapayments' ), KlarnaExpressCheckout::VERSION, true );
+		wp_register_script( 'kec-checkout', "{$this->assets_path}js/kec-checkout.js", array( 'jquery', 'klarnapayments' ), KlarnaExpressCheckout::VERSION, true );
+		wp_register_script_module( '@klarna/kec-one-step', "{$this->assets_path}js/kec-one-step.js", array( '@klarna/interoperability_token' ), KlarnaExpressCheckout::VERSION );
 	}
 
 	/**
-	 * Enqueue scripts.
+	 * Enqueue scripts.dd
 	 */
 	public function enqueue_assets() {
 		// If KEC is not enabled, return.
@@ -76,11 +80,18 @@ class Assets {
 			return;
 		}
 
-		if ( is_cart() || is_product() ) {
-			$this->enqueue_cart_assets();
+		// If neither One step or Two step is available, return.
+		if ( ! PluginFeatures::is_available( Features::KEC_ONE_STEP ) && ! PluginFeatures::is_available( Features::KEC_TWO_STEP ) ) {
+			return;
 		}
 
-		if ( is_checkout() ) {
+		if ( is_cart() || is_product() ) {
+			if ( PluginFeatures::is_available( Features::KEC_ONE_STEP ) ) {
+				$this->enqueue_one_step_assets();
+			} else {
+				$this->enqueue_cart_assets();
+			}
+		} elseif ( is_checkout() && PluginFeatures::is_available( Features::KEC_TWO_STEP ) ) {
 			$this->enqueue_checkout_assets();
 		}
 	}
@@ -129,7 +140,7 @@ class Assets {
 					'url'    => \WC_AJAX::get_endpoint( 'kec_set_cart' ),
 					'nonce'  => wp_create_nonce( 'kec_set_cart' ),
 					'method' => 'POST',
-				),
+				)
 			),
 			'is_product_page' => $is_product_page,
 			'product'         => $is_product_page ? array(
@@ -142,14 +153,13 @@ class Assets {
 			'locale'          => $this->locale,
 		);
 
-		// wp_localize_script( 'kec-cart', 'kec_cart_params', $cart_params );
+		wp_localize_script( 'kec-cart', 'kec_cart_params', $cart_params );
 
 		// Enqueue the style for the cart page.
 		wp_enqueue_style( 'kec-cart' );
 
 		// Load the Klarna Payments library script before our script.
-		// wp_enqueue_script( 'klarnapayments' );
-		// wp_enqueue_script( 'kec-cart' );
+		wp_enqueue_script( 'kec-cart' );
 		$this->enqueue_one_step_assets();
 	}
 
@@ -183,11 +193,10 @@ class Assets {
 			'client_token' => $client_token,
 		);
 
-		// wp_localize_script( 'kec-checkout', 'kec_checkout_params', $checkout_prams );
+		wp_localize_script( 'kec-checkout', 'kec_checkout_params', $checkout_prams );
 
 		// Load the Klarna Payments library script before our script.
-		// wp_enqueue_script( 'klarnapayments' );
-		// wp_enqueue_script( 'kec-checkout' );
+		wp_enqueue_script( 'kec-checkout' );
 	}
 
 	/**
@@ -220,6 +229,11 @@ class Assets {
 					'nonce'  => wp_create_nonce( 'kec_one_step_shipping_option_changed' ),
 					'method' => 'POST',
 				),
+				'finalize_order' => array(
+					'url'    => \WC_AJAX::get_endpoint( 'kec_one_step_finalize_order' ),
+					'nonce'  => wp_create_nonce( 'kec_one_step_finalize_order' ),
+					'method' => 'POST',
+				),
 			),
 			'client_id' => $this->settings->get_credentials_secret(),
 			'testmode'  => $this->settings->is_testmode(),
@@ -231,7 +245,8 @@ class Assets {
 			'source'    => is_cart() ? 'cart' : ( is_product() ? get_the_ID() : 'unknown' ),
 		);
 
+		KP_Assets::register_module_data( $one_step_params, '@klarna/kec-one-step' );
 		wp_localize_script( 'kec-one-step', 'kec_one_step_params', $one_step_params );
-		wp_enqueue_script( 'kec-one-step' );
+		wp_enqueue_script_module( '@klarna/kec-one-step' );
 	}
 }
