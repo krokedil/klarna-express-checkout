@@ -213,7 +213,6 @@ class WebhookSetup {
 
 		$url           = get_rest_url( null, '/klarna/v1/kec/notifications' );
 		$event_types   = array(
-			'payment.request.state-change.submitted',
 			'payment.request.state-change.completed',
 			'payment.request.state-change.expired'
 		);
