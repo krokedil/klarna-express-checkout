@@ -16,7 +16,6 @@ class NotificationsProvider {
 	 */
 	public function __construct() {
 		$this->handlers = array(
-			new PaymentStateSubmitted(),
 			new PaymentStateCompleted(),
 			new PaymentStateExpired(),
 		);
