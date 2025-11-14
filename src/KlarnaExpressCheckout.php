@@ -1,6 +1,8 @@
 <?php
 namespace Krokedil\KlarnaExpressCheckout;
 
+use Krokedil\Klarna\Features;
+use Krokedil\Klarna\PluginFeatures;
 use Krokedil\KlarnaExpressCheckout\Api\Controllers\Notifications;
 use Krokedil\KlarnaExpressCheckout\Blocks\OneStepBlocksIntegration;
 
@@ -180,6 +182,11 @@ class KlarnaExpressCheckout {
 	 * @return void
 	 */
 	public function setup_blocks_integration() {
+		// Only if One step is available.
+		if ( ! PluginFeatures::is_available( Features::KEC_ONE_STEP ) ) {
+			return;
+		}
+
 		if ( ! class_exists( 'Automattic\WooCommerce\Blocks\Package' ) || ! version_compare( \Automattic\WooCommerce\Blocks\Package::get_version(), '4.4.0', '>' ) ) {
 			return;
 		}
