@@ -160,7 +160,6 @@ class Assets {
 
 		// Load the Klarna Payments library script before our script.
 		wp_enqueue_script( 'kec-cart' );
-		$this->enqueue_one_step_assets();
 	}
 
 	/**
