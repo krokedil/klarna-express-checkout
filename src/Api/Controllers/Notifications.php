@@ -78,10 +78,9 @@ class Notifications extends Controller {
 				return $this->success_response();
 			}
 
-
 			$event_type    = $meta_data['event_type'] ?? '';
 			$event_version = $meta_data['event_version'] ?? '';
-			$payload       = $meta_data['payload'] ?? array();
+			$payload       = $body['payload'] ?? array();
 
 			// Get the handler for the event type and version.
 			$handler = $this->provider->get_handler( $event_type, $event_version );
@@ -90,13 +89,12 @@ class Notifications extends Controller {
 				do_action( "klarna_notification_{$event_type}_{$event_version}", $body ); // Trigger the action to allow other plugins to handle the event.
 				return $this->success_response(); // Return a success if nothing has thrown an exception.
 			}
-
-			$handler->handle_notification( $payload );
+			$response = $handler->handle_notification( $payload );
 
 			// Trigger an action to let other plugins know that a change has been made, and allow them to take action if needed.
 			do_action( "klarna_notification_{$event_type}_{$event_version}", $body );
 
-			return $this->success_response();
+			return $response ?? $this->success_response();
 		} catch ( \Exception $e ) {
 			return new \WP_REST_Response( array( 'error' => $e->getMessage() ), 500 );
 		}
