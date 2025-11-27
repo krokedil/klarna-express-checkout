@@ -36,10 +36,7 @@ class Notifications extends Controller {
 	 * @return void
 	 */
 	public static function register_controller() {
-		add_filter( 'klarna_register_api_controller', function( $controllers ) {
-			$controllers[] = new Notifications();
-			return $controllers;
-		} );
+		KP_WC()->api_registry()->register_controller( new Notifications() );
 	}
 
 	/**
