@@ -480,20 +480,20 @@ class OneStepCheckout {
 		$order->set_customer_ip_address( \WC_Geolocation::get_ip_address() );
 		$order->set_customer_user_agent( wc_get_user_agent() );
 
-		// Calculate totals.
-		$order->calculate_totals();
 
 		// Set the payment request ID and payment token as order meta.
 		$order->update_meta_data( '_kec_payment_request_id', $payment_request_id );
 		$order->update_meta_data( '_kec_unique_id', $unique_id );
 		$order->set_currency( get_woocommerce_currency() );
+		$order->set_prices_include_tax( 'yes' === get_option( 'woocommerce_prices_include_tax' ) );
 
 		WC()->checkout()->set_data_from_cart( $order );
 
 		// Set the customer address data from the customer session.
 		self::set_order_address( $order );
 
-		// Save the order.
+		// Calculate the order totals and save the order.
+		$order->calculate_totals();
 		$order->save();
 
 		// Save the order id as session data so we can update the order later if needed.
