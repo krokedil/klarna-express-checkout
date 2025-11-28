@@ -333,6 +333,7 @@ class OneStepCheckout {
 	 * @return int The formatted price in cents.
 	 */
 	private static function format_price( $price ) {
+		$price = floatval( $price ); // Ensure the price is a float value to avoid issues with string formatting.
 		return intval( number_format( $price * 100, 0, ".", "" ) );
 	}
 
