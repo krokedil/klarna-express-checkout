@@ -246,9 +246,8 @@ class AJAX {
 			wp_send_json_error( "Missing or invalid source: {$source}" );
 		}
 
-		// If the source is cart, get the cart data.
-		if ( 'cart' === $source ) {
-		} else {
+		// If the source is not the cart already, then empty the cart and add the product sent to it.
+		if ( 'cart' !== $source ) {
 			$variation_id = 0;
 			// Ensure the source is a valid product ID.
 			$source  = absint( $source );
