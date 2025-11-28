@@ -1,6 +1,9 @@
 <?php
 namespace Krokedil\KlarnaExpressCheckout\Api\Notifications;
 
+use Krokedil\Klarna\PluginFeatures;
+use Krokedil\KlarnaExpressCheckout\Interfaces\AcquiringPartnerIntegration;
+
 defined( 'ABSPATH' ) || exit;
 
 abstract class Handler {
@@ -26,6 +29,24 @@ abstract class Handler {
 	 */
 	public function matches( $event_type, $event_version ) {
 		return $this->event_type === $event_type && $this->event_version === $event_version;
+	}
+
+	/**
+	 * Get the Acquiring Partner integration class to use for this notification.
+	 *
+	 * @return AcquiringPartnerIntegration|null
+	 */
+	public function get_acquiring_partner_integration()  {
+		$ap_key       = PluginFeatures::get_acquiring_partner_key();
+		$integrations = apply_filters( 'kec_acquiring_partner_integrations', [] );
+
+		foreach ( $integrations as $integration ) {
+			if ( $integration->get_key() === $ap_key ) {
+				return $integration;
+			}
+		}
+
+		return null;
 	}
 
 	/**

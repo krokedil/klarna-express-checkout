@@ -83,7 +83,7 @@ class KlarnaExpressCheckout {
 		add_action( 'init', array( $this, 'maybe_unhook_kp_actions' ), 15 );
 		add_action( 'woocommerce_single_product_summary', array( $this, 'add_kec_button' ), 31 );
 		add_action( 'woocommerce_blocks_loaded', array( $this, 'setup_blocks_integration' ) );
-		add_action( 'kp_plugin_features_initialized', OneStepCheckout::class . '::register_hooks' );
+        OneStepCheckout::register_hooks();
 
 		// Register the API controller for handling notifications in the Klarna API.
 		$this->register_api_controller();

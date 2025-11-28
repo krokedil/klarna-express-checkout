@@ -40,7 +40,23 @@ class PaymentStateCompleted extends Handler {
 		// Set the order address data.
 		$this->set_address( $order, $payload );
 
-		do_action( 'kec_process_order', $order, $interoperability_token, [], $payload['state'], $payload );
+		//do_action( 'kec_process_order', $order, $interoperability_token, [], $payload['state'], $payload );
+		$redirect_url           = $order->get_checkout_order_received_url();
+		$ap_partner_integration = $this->get_acquiring_partner_integration();
+		if ( $ap_partner_integration ) {
+			$redirect_url = $ap_partner_integration->process_order_state(
+				$order,
+				$interoperability_token,
+				[],
+				$payload['state'],
+				$payload
+			);
+		} else {
+			do_action( 'kec_process_order', $order, $interoperability_token, [], $payload['state'], $payload );
+		}
+
+		// Store the redirect URL in order to redirect the customer when they get to the confirmation page.
+		$order->update_meta_data( '_kec_redirect_url', $redirect_url );
 
 		// Save the order.
 		$order->save();

@@ -22,7 +22,6 @@ class OneStepCheckout {
 		if ( ! PluginFeatures::is_available( Features::KEC_ONE_STEP ) ) {
 			return;
 		}
-
 		add_action( 'init', __CLASS__ . '::maybe_redirect_kec_one_step_checkout' );
 	}
 
