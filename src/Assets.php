@@ -249,7 +249,6 @@ class Assets {
 		);
 
 		KP_Assets::register_module_data( $one_step_params, '@klarna/kec-one-step' );
-		wp_localize_script( 'kec-one-step', 'kec_one_step_params', $one_step_params );
 		wp_enqueue_script_module( '@klarna/kec-one-step' );
 	}
 }
