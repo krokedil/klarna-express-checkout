@@ -346,6 +346,11 @@ class OneStepCheckout {
 	 */
 	public static function create_order( $payment_request_id, $payment_token ) {
 		$order = self::update_or_create_wc_order( $payment_request_id, $payment_token );
+
+		if ( ! $order || is_wp_error( $order ) ) {
+			return false;
+		}
+
 		// Save the order id as session data so we can update the order later if needed.
 		WC()->session->set( 'kec_one_step_order_id', $order->get_id() );
 
