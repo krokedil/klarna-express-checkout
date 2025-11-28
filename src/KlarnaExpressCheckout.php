@@ -117,7 +117,11 @@ class KlarnaExpressCheckout {
 		// Get the instances of the Klarna Payments classes we need to unhook actions from.
 		$kp_session  = KP_WC()->session;
 		$kp_checkout = KP_WC()->checkout;
-		$kp_gateway  = WC()->payment_gateways()->get_available_payment_gateways()['klarna_payments'];
+		$kp_gateway  = WC()->payment_gateways()->get_available_payment_gateways()['klarna_payments'] ?? null;
+
+		if ( empty( $kp_session ) || empty( $kp_checkout ) || empty( $kp_gateway ) ) {
+			return;
+		}
 
 		// Unhook session actions.
 		remove_action( 'woocommerce_after_calculate_totals', array( $kp_session, 'get_session' ), 999999 );
