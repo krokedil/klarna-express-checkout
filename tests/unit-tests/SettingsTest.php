@@ -10,6 +10,9 @@ class SettingsTest extends TestCase {
 
 	public function setUp(): void {
 		parent::setUp();
+		WP_Mock::userFunction( 'get_option' )->with( 'kec_webhook', array() )->andReturn( array() );
+		WP_Mock::userFunction( 'get_option' )->with( 'kec_signing_key', array() )->andReturn( array() );
+		WP_Mock::userFunction( 'get_option' )->with( 'kp_unavailable_feature_ids', array() )->andReturn( array() );
 		WP_Mock::userFunction( 'get_option' )
 			->with( 'test_key', array() )
 			->andReturn(
