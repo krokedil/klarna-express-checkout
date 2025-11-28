@@ -61,6 +61,8 @@ class Assets {
 
 	/**
 	 * Register scripts.
+	 *
+	 * @return void
 	 */
 	public function register_assets() {
 		// Register the style for the cart page.
@@ -72,7 +74,9 @@ class Assets {
 	}
 
 	/**
-	 * Enqueue scripts.dd
+	 * Enqueue scripts.
+	 *
+	 * @return void
 	 */
 	public function enqueue_assets() {
 		// If KEC is not enabled, return.
