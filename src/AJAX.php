@@ -51,6 +51,9 @@ class AJAX {
 			'kec_set_cart',
 			'kec_auth_callback',
 			'kec_finalize_callback',
+			'kec_one_step_get_initiate_body',
+			'kec_one_step_shipping_address_change',
+			'kec_one_step_shipping_option_changed'
 		);
 
 		foreach ( $ajax_events as $ajax_event ) {
@@ -224,6 +227,99 @@ class AJAX {
 		} catch ( \Exception $e ) {
 			wp_send_json_error( $e->getMessage() );
 		}
+	}
+
+	/**
+	 * Get the payload for the one step checkout request.
+	 *
+	 * @return void
+	 */
+	public function kec_one_step_get_initiate_body() {
+		// Ensure the nonce is valid.
+		check_ajax_referer( 'kec_one_step_get_initiate_body', 'nonce' );
+
+		// Get the source.
+		$source = filter_input( INPUT_POST, 'source', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+
+		// If the source is not set or unknown, return an error.
+		if ( empty( $source ) || 'unknown' === $source ) {
+			wp_send_json_error( "Missing or invalid source: {$source}" );
+		}
+
+		// If the source is not the cart already, then empty the cart and add the product sent to it.
+		if ( 'cart' !== $source ) {
+			$variation_id = filter_input( INPUT_POST, 'variation_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+			// Ensure the source is a valid product ID.
+			$source  = absint( $source );
+			$product = wc_get_product( $source );
+
+			if ( ! $product ) {
+				wp_send_json_error( 'Invalid product ID' );
+			}
+
+			// Clear the cart.
+			WC()->cart->empty_cart();
+
+			// Add the product to the cart. If the variation id is null, set it to 0.
+			$result = WC()->cart->add_to_cart( $source, 1, $variation_id ?? 0 );
+
+			if ( ! $result ) {
+				wp_send_json_error( 'Could not add the product to the cart' );
+			}
+		}
+
+		wp_send_json_success( OneStepCheckout::get_initiate_body() );
+	}
+
+	/**
+	 * Handle the shipping address change event and return the response body.
+	 *
+	 * @return void
+	 */
+	public static function kec_one_step_shipping_address_change() {
+		// Ensure the nonce is valid.
+		check_ajax_referer( 'kec_one_step_shipping_address_change', 'nonce' );
+
+		// Get the shipping address from the request.
+		$post_data = filter_input_array( INPUT_POST, array(
+			'shippingAddress' => array(
+				'flags'  => FILTER_REQUIRE_ARRAY,
+				'city'   => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+				'postcode' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+				'region' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+				'country' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+			),
+			'paymentRequestId' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+			'paymentToken'     => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+		) );
+
+		$shipping_address = $post_data['shippingAddress'] ?? array();
+		$payment_request_id = $post_data['paymentRequestId'] ?? '';
+		$payment_token = $post_data['paymentToken'] ?? '';
+
+		if ( empty( $shipping_address ) ) {
+			wp_send_json_error( 'No shipping address was posted' );
+		}
+
+		wp_send_json_success( OneStepCheckout::get_shipping_address_change_body( $shipping_address, $payment_request_id, $payment_token ) );
+	}
+
+	/**
+	 * Set the selected shipping method and return the updated response body.
+	 *
+	 * @return void
+	 */
+	public static function kec_one_step_shipping_option_changed() {
+		// Ensure the nonce is valid.
+		check_ajax_referer( 'kec_one_step_shipping_option_changed', 'nonce' );
+
+		$selected_option = filter_input( INPUT_POST, 'selectedOption', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+
+		if ( empty( $selected_option ) ) {
+			wp_send_json_error( 'No shipping option was selected' );
+		}
+
+		wp_send_json_success( OneStepCheckout::get_changed_shipping_option_response( $selected_option ) );
 	}
 
 	/**
