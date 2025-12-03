@@ -9,6 +9,7 @@ use Krokedil\KlarnaExpressCheckout\KlarnaExpressCheckout;
  * Class OneStepBlocksIntegration.
  *
  * Handles the integration with the WooCommerce cart blocks for the one step express checkout.
+ * @codeCoverageIgnore
  */
 class OneStepBlocksIntegration implements IntegrationInterface {
 
