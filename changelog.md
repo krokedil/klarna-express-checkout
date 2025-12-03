@@ -13,6 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Added handling for webhook events from Klarna to handle order cancellations and completion from Klarna when using the one step checkout flow.
 
 ------------------
+## [1.4.3] - 2025-10-01
+### Fixed
+* Fixed missed composer version update.
+
+## [1.4.2] - 2025-10-01
+### Fixed
+* Fixed a potential issue that could happen if we tried to initialize the KEC button before the Klarna Payments script was loaded and had registered the `Klarna.Payments.Buttons` object in the window.
+
 ## [1.4.1] - 2024-11-12
 ### Changed
 * The KEC button will remain hidden on a variable product page until a variant is selected.

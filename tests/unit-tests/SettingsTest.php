@@ -33,6 +33,9 @@ class SettingsTest extends TestCase {
 	}
 
 	public function testIsEnabled() {
+		WP_Mock::userFunction( 'get_option' )
+			->with( 'kp_unavailable_feature_ids', array() )
+			->andReturn( array() );
 		$this->assertTrue( $this->settings->is_enabled() );
 	}
 
