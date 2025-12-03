@@ -238,14 +238,15 @@ class Assets {
 					'method' => 'POST',
 				),
 			),
-			'client_id' => $this->settings->get_credentials_secret(),
-			'testmode'  => $this->settings->is_testmode(),
-			'theme'     => $this->settings->get_theme(),
-			'shape'     => $this->settings->get_shape(),
-			'locale'    => $this->locale,
-			'currency'  => get_woocommerce_currency(),
-			'amount'    => intval( floatval( $amount ) * 100 ),
-			'source'    => is_cart() ? 'cart' : ( is_product() ? get_the_ID() : 'unknown' ),
+			'client_id'    => $this->settings->get_credentials_secret(),
+			'testmode'     => $this->settings->is_testmode(),
+			'theme'        => $this->settings->get_theme(),
+			'shape'        => $this->settings->get_shape(),
+			'locale'       => $this->locale,
+			'currency'     => get_woocommerce_currency(),
+			'amount'       => intval( floatval( $amount ) * 100 ),
+			'source'       => is_cart() ? 'cart' : ( is_product() ? get_the_ID() : 'unknown' ),
+			'is_variation' => is_product() ? ( wc_get_product( get_the_ID() )->is_type( 'variation' ) ? true : false ) : false,
 		);
 
 		KP_Assets::register_module_data( $one_step_params, '@klarna/kec-one-step' );

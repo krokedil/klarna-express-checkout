@@ -248,7 +248,7 @@ class AJAX {
 
 		// If the source is not the cart already, then empty the cart and add the product sent to it.
 		if ( 'cart' !== $source ) {
-			$variation_id = 0;
+			$variation_id = filter_input( INPUT_POST, 'variation_id', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 			// Ensure the source is a valid product ID.
 			$source  = absint( $source );
 			$product = wc_get_product( $source );
@@ -260,8 +260,8 @@ class AJAX {
 			// Clear the cart.
 			WC()->cart->empty_cart();
 
-			// Add the product to the cart.
-			$result = WC()->cart->add_to_cart( $source, 1, $variation_id );
+			// Add the product to the cart. If the variation id is null, set it to 0.
+			$result = WC()->cart->add_to_cart( $source, 1, $variation_id ?? 0 );
 
 			if ( ! $result ) {
 				wp_send_json_error( 'Could not add the product to the cart' );

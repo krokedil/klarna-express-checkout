@@ -24,6 +24,7 @@ const KECOneStep = {
   },
   Klarna: null,
   isInitiating: false,
+  variationId: null,
 
   /**
    * Initialize the Klarna Express Checkout script for One Step Checkout.
@@ -47,6 +48,38 @@ const KECOneStep = {
 
     KECOneStep.Klarna.Payment.on("shippingaddresschange", KECOneStep.onShippingAddressChange);
     KECOneStep.Klarna.Payment.on("shippingoptionselect", KECOneStep.onShippingOptionSelect);
+
+    // Listen for the WooCommerce variation change event and set the selected variation ID.
+    $(document.body).on("found_variation", KECOneStep.onFoundVariation);
+
+  },
+
+  /**
+   * Checks if we are on a product page, and if so, if the product is a variable product.
+   * If it is, it will see if the customer has selected a variation.
+   *
+   * @returns {boolean} True if we can continue, or if we need to wait for a variation to be set.
+   */
+  checkVariation() {
+    const { source, is_variation } = KECOneStep.params;
+
+    if (source === 'cart' || !is_variation) {
+      return true;
+    }
+
+    return KECOneStep.variationId !== null; // Variation must be selected to continue
+  },
+
+  /**
+   * Handle the found variation event.
+   *
+   * @param {object} event
+   * @param {object} variation
+   *
+   * @returns {void}
+   */
+  onFoundVariation(event, variation) {
+    KECOneStep.variationId = variation.variation_id;
   },
 
   /**
@@ -68,6 +101,7 @@ const KECOneStep = {
       data: {
         nonce: nonce,
         source: KECOneStep.params.source,
+        variation_id: KECOneStep.variationId,
       },
     });
 
