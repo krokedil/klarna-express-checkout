@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ------------------
+## [2.0.0] - 2025-12-03
+### Added
+* Implemented support for One step checkout flow for AP partners using Klarna Express Checkout.
+* Added settings page output to create webhooks and signing keys for Klarna Express Checkout, needed for the one step checkout flow.
+* Added API calls to create and manage webhooks and signing keys for Klarna Express Checkout.
+* Added handling for webhook events from Klarna to handle order cancellations and completion from Klarna when using the one step checkout flow.
+
 ## [1.4.3] - 2025-10-01
 ### Fixed
 * Fixed missed composer version update.
