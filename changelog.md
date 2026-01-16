@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+* Setting to select which flow to use for KEC when both one step checkout and two step flows are available and a AP key exists.
+
+### Fix
+* Fixed an issue where the one step checkout flow would not be prioritized when both flows were available.
 
 ------------------
 ## [2.0.0] - 2025-12-03

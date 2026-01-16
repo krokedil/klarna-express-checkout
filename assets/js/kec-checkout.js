@@ -25,9 +25,18 @@ jQuery(function ($) {
     init() {
       const { client_token } = kec_checkout_params;
 
-      Klarna.Payments.init({
-        client_token: client_token,
-      });
+      // Wait for the Klarna script to load.
+      const interval = setInterval(() => {
+        if (window.Klarna && window.Klarna.Payments && window.Klarna.Payments) {
+          clearInterval(interval);
+          Klarna.Payments.init({
+            client_token: client_token,
+          });
+        }
+      }, 100);
+
+      // Stop trying to initialize klarna after 2 seconds.
+      setTimeout(() => clearInterval(interval), 2000);
 
       // Add listener to load the iframe.
       $(document.body).on("updated_checkout", kec_checkout.loadIframe);

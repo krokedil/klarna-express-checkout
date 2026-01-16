@@ -1,6 +1,9 @@
 <?php
 namespace Krokedil\KlarnaExpressCheckout;
 
+use Krokedil\Klarna\Features;
+use Krokedil\Klarna\PluginFeatures;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -96,6 +99,7 @@ class Settings {
 			'kec_theme'              => $settings['kec_theme'] ?? 'dark',
 			'kec_shape'              => $settings['kec_shape'] ?? 'default',
 			'kec_placement'          => $settings['kec_placement'] ?? 'both',
+			'kec_flow'               => $settings['kec_flow'] ?? 'two_step',
 			'kec_webhook'            => get_option( 'kec_webhook', array() ),
 			'kec_signing_key'        => get_option( 'kec_signing_key', array() ),
 		);
@@ -174,6 +178,23 @@ class Settings {
 	}
 
 	/**
+	 * Get the KEC flow value.
+	 *
+	 * @return string
+	 */
+	public function get_kec_flow() {
+		// If only the two step flow is available or the merchant does not have a valid acquiring partner key, return two step.
+		$one_step_available    = PluginFeatures::is_available( Features::KEC_ONE_STEP );
+		$acquiring_partner_key = PluginFeatures::get_acquiring_partner_key();
+
+		if ( ! $one_step_available || empty( $acquiring_partner_key ) ) {
+			return 'two_step';
+		}
+
+		return $this->options['kec_flow'] ?? 'two_step';
+	}
+
+	/**
 	 * Is Klarna in testmode or not.
 	 *
 	 * @return bool
@@ -193,6 +214,18 @@ class Settings {
 	public function get_setting_fields() {
 		$created_webhook = get_option( 'kec_webhook', array() );
 		$webhook_created = ! empty( $created_webhook );
+		$one_step_available = PluginFeatures::is_available( Features::KEC_ONE_STEP ) && ! empty( PluginFeatures::get_acquiring_partner_key() );
+		$two_step_available = PluginFeatures::is_available( Features::KEC_TWO_STEP );
+
+		$flow_options = array();
+
+		if ( $two_step_available ) {
+			$flow_options['two_step'] = __( 'Two step', 'klarna-express-checkout' );
+		}
+
+		if ( $one_step_available ) {
+			$flow_options['one_step'] = __( 'One step', 'klarna-express-checkout' );
+		}
 
 		return array(
 			'kec_settings'  => array(
@@ -251,6 +284,13 @@ class Settings {
 					'product' => __( 'Product pages', 'klarna-express-checkout' ),
 					'cart'    => __( 'Cart page', 'klarna-express-checkout' ),
 				),
+			),
+			'kec_flow' => array(
+				'title'   => __( 'Flow', 'klarna-express-checkout' ),
+				'description' => __( 'Select the checkout flow for Klarna Express Checkout. One step is only available for stores integrating Klarna through a different payment provider.', 'klarna-express-checkout' ),
+				'type'    =>  ! empty( $flow_options ) ? 'select' : 'hidden',
+				'default' => 'two_step',
+				'options' => $flow_options,
 			),
 			'kec_webhook' => array(
 				'type'        => 'kp_text_info',
