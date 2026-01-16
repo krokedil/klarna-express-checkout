@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || exit;
  * @package Krokedil\KlarnaExpressCheckout
  */
 class KlarnaExpressCheckout {
-	const VERSION = '2.0.0';
+	public const VERSION = '2.1.0';
 
 	/**
 	 * Reference to the Session class.
@@ -83,7 +83,7 @@ class KlarnaExpressCheckout {
 		add_action( 'init', array( $this, 'maybe_unhook_kp_actions' ), 15 );
 		add_action( 'woocommerce_single_product_summary', array( $this, 'add_kec_button' ), 31 );
 		add_action( 'woocommerce_blocks_loaded', array( $this, 'setup_blocks_integration' ) );
-        OneStepCheckout::register_hooks();
+        OneStepCheckout::register_hooks( $this->settings->get_kec_flow() );
 
 		// Register the API controller for handling notifications in the Klarna API.
 		$this->register_api_controller();
@@ -186,8 +186,9 @@ class KlarnaExpressCheckout {
 	 * @return void
 	 */
 	public function setup_blocks_integration() {
-		// Only if One step is available.
-		if ( ! PluginFeatures::is_available( Features::KEC_ONE_STEP ) ) {
+		// Only if One step is the selected flow and available.
+		$flow = $this->settings->get_kec_flow();
+		if ( $flow !== 'one_step' || ! PluginFeatures::is_available( Features::KEC_ONE_STEP ) ) {
 			return;
 		}
 

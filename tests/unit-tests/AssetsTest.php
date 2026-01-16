@@ -100,6 +100,7 @@ class AssetsTest extends TestCase {
 		$kpPluginFeatures = Mockery::mock( 'overload:Krokedil\Klarna\PluginFeatures' );
 		$kpPluginFeatures->shouldReceive('is_available')->with( 'klarna-express-checkout:1-step' )->andReturn( false );
 		$kpPluginFeatures->shouldReceive('is_available')->with( 'klarna-express-checkout:2-step' )->andReturn( true );
+		$kpPluginFeatures->shouldReceive('get_acquiring_partner_key')->with()->andReturn( false );
 		$assets->enqueue_assets();
 	}
 

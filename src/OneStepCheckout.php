@@ -15,11 +15,13 @@ class OneStepCheckout {
 	/**
 	 * Register the hooks for the One Step Checkout flow that are needed.
 	 *
+	 * @param string $flow The selected KEC flow.
+	 *
 	 * @return void
 	 */
-	public static function register_hooks() {
-		// Only register the hooks if the feature is available.
-		if ( ! PluginFeatures::is_available( Features::KEC_ONE_STEP ) ) {
+	public static function register_hooks( $flow ) {
+		// Only register the hooks if the feature is available and the selected flow.
+		if ( $flow !== 'one_step' || ! PluginFeatures::is_available( Features::KEC_ONE_STEP ) ) {
 			return;
 		}
 		add_action( 'init', __CLASS__ . '::maybe_redirect_kec_one_step_checkout' );

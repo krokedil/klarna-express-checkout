@@ -84,18 +84,23 @@ class Assets {
 			return;
 		}
 
+		$two_step_available = PluginFeatures::is_available( Features::KEC_TWO_STEP );
+		$one_step_available = PluginFeatures::is_available( Features::KEC_ONE_STEP );
+
 		// If neither One step or Two step is available, return.
-		if ( ! PluginFeatures::is_available( Features::KEC_ONE_STEP ) && ! PluginFeatures::is_available( Features::KEC_TWO_STEP ) ) {
+		if ( ! $one_step_available && ! $two_step_available ) {
 			return;
 		}
 
+		$flow = $this->settings->get_kec_flow();
+
 		if ( is_cart() || is_product() ) {
-			if ( PluginFeatures::is_available( Features::KEC_ONE_STEP ) ) {
+			if ( $flow === 'one_step' && $one_step_available ) {
 				$this->enqueue_one_step_assets();
 			} else {
 				$this->enqueue_cart_assets();
 			}
-		} elseif ( is_checkout() && PluginFeatures::is_available( Features::KEC_TWO_STEP ) ) {
+		} elseif ( is_checkout() && $two_step_available ) {
 			$this->enqueue_checkout_assets();
 		}
 	}
