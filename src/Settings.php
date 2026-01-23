@@ -52,7 +52,6 @@ class Settings {
 
 		// Get the options array from the options key.
 		$this->options = $this->get_settings();
-
 	}
 
 	/**
@@ -79,7 +78,7 @@ class Settings {
 	public function update_setting( $key, $value ) {
 		$this->options[ $key ] = $value;
 
-		if( 'kec_webhook' === $key || 'kec_signing_key' === $key ) {
+		if ( 'kec_webhook' === $key || 'kec_signing_key' === $key ) {
 			// Store the webhook and signing key in their own options.
 			update_option( $key, $value );
 		}
@@ -212,8 +211,8 @@ class Settings {
 	 * @return array
 	 */
 	public function get_setting_fields() {
-		$created_webhook = get_option( 'kec_webhook', array() );
-		$webhook_created = ! empty( $created_webhook );
+		$created_webhook    = get_option( 'kec_webhook', array() );
+		$webhook_created    = ! empty( $created_webhook );
 		$one_step_available = PluginFeatures::is_available( Features::KEC_ONE_STEP ) && ! empty( PluginFeatures::get_acquiring_partner_key() );
 		$two_step_available = PluginFeatures::is_available( Features::KEC_TWO_STEP );
 
@@ -228,7 +227,7 @@ class Settings {
 		}
 
 		return array(
-			'kec_settings'  => array(
+			'kec_settings'       => array(
 				'id'          => 'kec_settings',
 				'title'       => 'Express Checkout',
 				'description' => __( 'Offer a 5x faster check-out process that lowers the threshold for shoppers to complete a purchase.', 'klarna-express-checkout' ),
@@ -240,18 +239,18 @@ class Settings {
 				),
 				'type'        => 'kp_section_start',
 			),
-			'kec_enabled'   => array(
+			'kec_enabled'        => array(
 				'title'   => __( 'Enable/Disable', 'klarna-express-checkout' ),
 				'type'    => 'checkbox',
 				'label'   => __( 'Enable Klarna Express Checkout', 'klarna-express-checkout' ),
 				'default' => 'no',
 			),
-			'kec_info'      => array(
+			'kec_info'           => array(
 				'type'        => 'kp_text_info',
 				'title'       => __( 'Placements & button style', 'klarna-express-checkout' ),
 				'description' => __( 'Tailor the express checkout button to fit your brand by adjusting the button theme, shape and selecting placements.', 'klarna-express-checkout' ),
 			),
-			'kec_theme'     => array(
+			'kec_theme'          => array(
 				'title'       => __( 'Theme', 'klarna-express-checkout' ),
 				'type'        => 'select',
 				'description' => __( 'Select the theme for the Klarna Express Checkout.', 'klarna-express-checkout' ),
@@ -263,7 +262,7 @@ class Settings {
 				),
 				'default'     => 'dark',
 			),
-			'kec_shape'     => array(
+			'kec_shape'          => array(
 				'title'       => __( 'Shape', 'klarna-express-checkout' ),
 				'type'        => 'select',
 				'description' => __( 'Select the shape for the Klarna Express Checkout.', 'klarna-express-checkout' ),
@@ -275,7 +274,7 @@ class Settings {
 				),
 				'default'     => 'default',
 			),
-			'kec_placement' => array(
+			'kec_placement'      => array(
 				'title'   => __( 'Placements', 'klarna-express-checkout' ),
 				'type'    => 'select',
 				'default' => 'both',
@@ -285,23 +284,25 @@ class Settings {
 					'cart'    => __( 'Cart page', 'klarna-express-checkout' ),
 				),
 			),
-			'kec_flow' => array(
-				'title'   => __( 'Flow', 'klarna-express-checkout' ),
+			'kec_flow'           => array(
+				'title'       => __( 'Flow', 'klarna-express-checkout' ),
 				'description' => __( 'Select the checkout flow for Klarna Express Checkout. One step is only available for stores integrating Klarna through a different payment provider.', 'klarna-express-checkout' ),
-				'type'    =>  ! empty( $flow_options ) ? 'select' : 'hidden',
-				'default' => 'two_step',
-				'options' => $flow_options,
+				'type'        => ! empty( $flow_options ) ? 'select' : 'hidden',
+				'default'     => 'two_step',
+				'options'     => $flow_options,
 			),
-			'kec_webhook' => array(
+			'kec_webhook'        => array(
+				'class'       => 'kec-webhook-section',
 				'type'        => 'kp_text_info',
 				'title'       => sprintf( __( 'Webhook %s', 'klarna-express-checkout' ), self::webhook_status_badge( $webhook_created ) ),
 				'description' => __( 'For one step Express Checkout to function, Klarna needs to be able to send callbacks to your store. Enable the callbacks and configure a signing key to use for the authentication.', 'klarna-express-checkout' ),
 			),
 			'kec_webhook_button' => array(
+				'class'           => 'kec-webhook-section',
 				'type'            => 'kec_webhook_button',
 				'webhook_created' => $webhook_created,
 			),
-			'kec_end'       => array(
+			'kec_end'            => array(
 				'type'     => 'kp_section_end',
 				'previews' => array(
 					array(
@@ -357,7 +358,7 @@ class Settings {
 	 *
 	 * @return void
 	 */
-	public static function webhook_button( $section  ) {
+	public static function webhook_button( $section ) {
 		$settings_link = KP_WC()->get_setting_link();
 
 		// Show any messages or errors from the URL parameter as inline notices.
@@ -365,11 +366,11 @@ class Settings {
 		self::maybe_show_errors();
 
 		// If the webhook are already created, show a delete and simulate button instead.
-		if( $section['webhook_created'] ) {
+		if ( $section['webhook_created'] ) {
 			$simulate_nonce = wp_create_nonce( 'kec_simulate_webhook' );
 			$delete_nonce   = wp_create_nonce( 'kec_delete_webhook' );
 			?>
-			<tr class="kp_settings__text_info">
+			<tr class="kp_settings__text_info <?php echo esc_attr( $section['class'] ); ?>">
 				<td colspan="2" class="forminp" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
 					<a style="margin-top: 10px;" href="<?php echo esc_url( "{$settings_link}&kec_action=simulate_webhook&nonce={$simulate_nonce}#klarna-payments-settings-kec_settings" ); ?>" class="button-link">
 						<?php esc_html_e( 'Test Webhook', 'klarna-express-checkout' ); ?>
@@ -385,7 +386,7 @@ class Settings {
 
 		$nonce = wp_create_nonce( 'kec_create_webhook' );
 		?>
-		<tr class="kp_settings__text_info">
+		<tr class="kp_settings__text_info <?php echo esc_attr( $section['class'] ); ?>">
 			<td colspan="2" class="forminp">
 				<p><?php esc_html_e( 'Create the necessary webhook in Klarna for the Express Checkout.', 'klarna-express-checkout' ); ?></p>
 				<a style="margin-top: 10px;" href="<?php echo esc_url( "{$settings_link}&kec_action=create_webhook&nonce={$nonce}#klarna-payments-settings-kec_settings" ); ?>" class="button button-primary">
