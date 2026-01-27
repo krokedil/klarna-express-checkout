@@ -198,7 +198,7 @@ class Assets {
 			return;
 		}
 
-		$checkout_params = array(
+		$two_step_params = array(
 			'ajax'         => array(
 				'get_payload'       => array(
 					'url'    => \WC_AJAX::get_endpoint( 'kec_get_payload' ),
@@ -218,10 +218,8 @@ class Assets {
 			'client_token' => $client_token,
 		);
 
-		wp_localize_script( 'kec-checkout', 'kec_checkout_params', $checkout_params );
-
-		// Load the Klarna Payments library script before our script.
-		wp_enqueue_script( 'kec-checkout' );
+		KP_Assets::register_module_data( $two_step_params, '@klarna/kec-two-step' );
+		wp_enqueue_script_module( '@klarna/kec-two-step' );
 	}
 
 	/**
