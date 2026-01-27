@@ -48,6 +48,7 @@ class Assets {
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ), 15 );
 		add_filter( 'script_loader_tag', array( $this, 'add_one_step_type' ), 10, 2 );
+		add_filter( 'script_loader_tag', array( $this, 'add_two_step_type' ), 10, 2 );
 	}
 
 	/**
@@ -71,6 +72,7 @@ class Assets {
 		wp_register_script( 'kec-cart', "{$this->assets_path}js/kec-cart.js", array( 'jquery', 'klarnapayments' ), KlarnaExpressCheckout::VERSION, true );
 		wp_register_script( 'kec-checkout', "{$this->assets_path}js/kec-checkout.js", array( 'jquery', 'klarnapayments' ), KlarnaExpressCheckout::VERSION, true );
 		wp_register_script_module( '@klarna/kec-one-step', "{$this->assets_path}js/kec-one-step.js", array( '@klarna/interoperability_token' ), KlarnaExpressCheckout::VERSION );
+		wp_register_script_module( '@klarna/kec-two-step', "{$this->assets_path}js/kec-two-step.js", array( '@klarna/interoperability_token' ), KlarnaExpressCheckout::VERSION );
 	}
 
 	/**
@@ -101,7 +103,7 @@ class Assets {
 				$this->enqueue_cart_assets();
 			}
 		} elseif ( is_checkout() && $two_step_available ) {
-			$this->enqueue_checkout_assets();
+			$this->enqueue_two_step_assets();
 		}
 	}
 
@@ -117,6 +119,21 @@ class Assets {
 			return $tag;
 		}
 
+		$tag = str_replace( '<script', '<script type="module"', $tag );
+		return $tag;
+	}
+
+	/**
+	 * Add the type="module" attribute to the two step script tag.
+	 *
+	 * @param string $tag The <script> tag for the enqueued script.
+	 * @param string $handle The script's registered handle.
+	 * @return string
+	 */
+	public function add_two_step_type( $tag, $handle ) {
+		if ( 'kec-two-step' !== $handle ) {
+			return $tag;
+		}
 		$tag = str_replace( '<script', '<script type="module"', $tag );
 		return $tag;
 	}
@@ -149,7 +166,7 @@ class Assets {
 					'url'    => \WC_AJAX::get_endpoint( 'kec_set_cart' ),
 					'nonce'  => wp_create_nonce( 'kec_set_cart' ),
 					'method' => 'POST',
-				)
+				),
 			),
 			'is_product_page' => $is_product_page,
 			'product'         => $is_product_page ? array(
@@ -174,14 +191,14 @@ class Assets {
 	/**
 	 * Enqueue checkout scripts.
 	 */
-	private function enqueue_checkout_assets() {
+	private function enqueue_two_step_assets() {
 		$client_token = Session::get_client_token();
 
 		if ( empty( $client_token ) ) {
 			return;
 		}
 
-		$checkout_prams = array(
+		$checkout_params = array(
 			'ajax'         => array(
 				'get_payload'       => array(
 					'url'    => \WC_AJAX::get_endpoint( 'kec_get_payload' ),
@@ -201,7 +218,7 @@ class Assets {
 			'client_token' => $client_token,
 		);
 
-		wp_localize_script( 'kec-checkout', 'kec_checkout_params', $checkout_prams );
+		wp_localize_script( 'kec-checkout', 'kec_checkout_params', $checkout_params );
 
 		// Load the Klarna Payments library script before our script.
 		wp_enqueue_script( 'kec-checkout' );
@@ -221,13 +238,13 @@ class Assets {
 		}
 
 		$one_step_params = array(
-			'ajax'      => array(
-				'get_initiate_body' => array(
+			'ajax'         => array(
+				'get_initiate_body'      => array(
 					'url'    => \WC_AJAX::get_endpoint( 'kec_one_step_get_initiate_body' ),
 					'nonce'  => wp_create_nonce( 'kec_one_step_get_initiate_body' ),
 					'method' => 'POST',
 				),
-				'shipping_change' => array(
+				'shipping_change'        => array(
 					'url'    => \WC_AJAX::get_endpoint( 'kec_one_step_shipping_address_change' ),
 					'nonce'  => wp_create_nonce( 'kec_one_step_shipping_address_change' ),
 					'method' => 'POST',
@@ -237,7 +254,7 @@ class Assets {
 					'nonce'  => wp_create_nonce( 'kec_one_step_shipping_option_changed' ),
 					'method' => 'POST',
 				),
-				'finalize_order' => array(
+				'finalize_order'         => array(
 					'url'    => \WC_AJAX::get_endpoint( 'kec_one_step_finalize_order' ),
 					'nonce'  => wp_create_nonce( 'kec_one_step_finalize_order' ),
 					'method' => 'POST',
