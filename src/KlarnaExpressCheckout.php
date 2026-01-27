@@ -5,6 +5,7 @@ use Krokedil\Klarna\Features;
 use Krokedil\Klarna\PluginFeatures;
 use Krokedil\KlarnaExpressCheckout\Api\Controllers\Notifications;
 use Krokedil\KlarnaExpressCheckout\Blocks\OneStepBlocksIntegration;
+use Krokedil\KlarnaExpressCheckout\Blocks\TwoStepBlocksIntegration;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -83,7 +84,8 @@ class KlarnaExpressCheckout {
 		add_action( 'init', array( $this, 'maybe_unhook_kp_actions' ), 15 );
 		add_action( 'woocommerce_single_product_summary', array( $this, 'add_kec_button' ), 31 );
 		add_action( 'woocommerce_blocks_loaded', array( $this, 'setup_blocks_integration' ) );
-        OneStepCheckout::register_hooks( $this->settings->get_kec_flow() );
+		OneStepCheckout::register_hooks( $this->settings->get_kec_flow() );
+		TwoStepCheckout::register_hooks( $this->settings->get_kec_flow() );
 
 		// Register the API controller for handling notifications in the Klarna API.
 		$this->register_api_controller();
@@ -200,14 +202,15 @@ class KlarnaExpressCheckout {
 		 */
 		$compatible_blocks = apply_filters(
 			'kec_compatible_blocks',
-			[ 'cart', 'mini-cart' ]
+			array( 'cart', 'mini-cart' )
 		);
 
 		foreach ( $compatible_blocks as $block_name ) {
 			add_action(
 				"woocommerce_blocks_{$block_name}_block_registration",
-				function( $integration_registry ) {
+				function ( $integration_registry ) {
 					$integration_registry->register( new OneStepBlocksIntegration() );
+					$integration_registry->register( new TwoStepBlocksIntegration() );
 				}
 			);
 		}
