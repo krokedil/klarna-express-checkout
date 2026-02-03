@@ -7,10 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+------------------
+## [2.1.1] - 2026-02-03
 ### Fix
 * The Webhook settings are now hidden unless the 'One step' flow setting is selected.
 
-------------------
 ## [2.1.0] - 2026-01-16
 ### Added
 * Setting to select which flow to use for KEC when both one step checkout and two step flows are available and a AP key exists.
