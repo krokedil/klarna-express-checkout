@@ -23,7 +23,7 @@ class PaymentStateExpired extends Handler {
 	 */
 	public function handle_notification( $payload ) {
 		$payment_request_id     = $payload['payment_request_id'] ?? null;
-		$interoperability_token = $payload['interoperability_token'] ?? '';
+		$interoperability_token = $payload['klarna_network_session_token'] ?? '';
 
 		if ( ! $payment_request_id ) {
 			throw new \WP_Exception( 'Missing required fields in the payload.' );
