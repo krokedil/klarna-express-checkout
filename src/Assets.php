@@ -74,6 +74,7 @@ class Assets {
 		wp_register_script( 'kec-admin', "{$this->assets_path}js/kec-admin.js", array( 'jquery' ), KlarnaExpressCheckout::VERSION, true );
 
 		wp_register_script( 'kec-cart', "{$this->assets_path}js/kec-cart.js", array( 'jquery', 'klarnapayments' ), KlarnaExpressCheckout::VERSION, true );
+		wp_register_script( 'kec-cart-one-step', "{$this->assets_path}js/kec-cart-one-step.js", array( 'jquery', 'klarnapayments' ), KlarnaExpressCheckout::VERSION, true );
 		wp_register_script( 'kec-checkout', "{$this->assets_path}js/kec-checkout.js", array( 'jquery', 'klarnapayments' ), KlarnaExpressCheckout::VERSION, true );
 		wp_register_script_module( '@klarna/kec-one-step', "{$this->assets_path}js/kec-one-step.js", array( '@klarna/interoperability_token' ), KlarnaExpressCheckout::VERSION );
 	}
@@ -269,5 +270,6 @@ class Assets {
 
 		KP_Assets::register_module_data( $one_step_params, '@klarna/kec-one-step' );
 		wp_enqueue_script_module( '@klarna/kec-one-step' );
+		wp_enqueue_script( 'kec-cart-one-step' );
 	}
 }
