@@ -25,8 +25,6 @@ const KECOneStep = {
   Klarna: null,
   isInitiating: false,
   variationId: null,
-  hasBoundEvents: false,
-  hasBoundRefreshEvents: false,
 
   getContainer() {
     return document.querySelector('#kec-pay-button');
@@ -76,22 +74,18 @@ const KECOneStep = {
 
     KECOneStep.mountButton();
 
-    if (!KECOneStep.hasBoundEvents) {
-      KECOneStep.Klarna.Payment.on("shippingaddresschange", KECOneStep.onShippingAddressChange);
-      KECOneStep.Klarna.Payment.on("shippingoptionselect", KECOneStep.onShippingOptionSelect);
+    KECOneStep.Klarna.Payment.on("shippingaddresschange", KECOneStep.onShippingAddressChange);
+    KECOneStep.Klarna.Payment.on("shippingoptionselect", KECOneStep.onShippingOptionSelect);
 
-      // Listen for the WooCommerce variation change event and set the selected variation ID.
-      $(document.body).on("found_variation", KECOneStep.onFoundVariation);
-      KECOneStep.hasBoundEvents = true;
-    }
+    // Listen for the WooCommerce variation change event and set the selected variation ID.
+    $(document.body).on("found_variation", KECOneStep.onFoundVariation);
+    KECOneStep.hasBoundEvents = true;
+    
 
-    if (!KECOneStep.hasBoundRefreshEvents) {
-      $(document.body).on(
-        "updated_cart_totals added_to_cart removed_from_cart updated_checkout updated_wc_div wc-blocks_added_to_cart wc-blocks_removed_from_cart",
-        KECOneStep.onCartUpdated
-      );
-      KECOneStep.hasBoundRefreshEvents = true;
-    }
+    $(document.body).on(
+      "updated_cart_totals added_to_cart removed_from_cart updated_checkout updated_wc_div wc-blocks_added_to_cart wc-blocks_removed_from_cart",
+      KECOneStep.onCartUpdated
+    );
 
   },
 
