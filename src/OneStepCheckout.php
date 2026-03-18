@@ -204,7 +204,7 @@ class OneStepCheckout {
 		}
 
 		return array(
-			'amount'                          => self::format_price( WC()->cart->get_cart_contents_total() + WC()->cart->get_cart_contents_tax() ) + $selected_shipping_option['amount'] ?? 0,
+			'amount'                          => self::format_price( WC()->cart->get_cart_contents_total() + WC()->cart->get_cart_contents_tax() + ( $selected_shipping_option['amount'] ?? 0 ) ),
 			'currency'                        => get_woocommerce_currency(),
 			'lineItems'                       => $line_items,
 			'selectedShippingOptionReference' => $selected_shipping_option['shippingOptionReference'] ?? '',
