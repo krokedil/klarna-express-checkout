@@ -173,7 +173,22 @@ class OneStepCheckout {
 		WC()->cart->calculate_shipping();
 		WC()->cart->calculate_totals();
 
-		$packages         = WC()->shipping->get_packages();
+		$shipping_needed = WC()->cart->needs_shipping();
+		// Klarna still expects shipping options for virtual carts, so provide a zero-cost fallback rate.
+		$packages = $shipping_needed ? WC()->shipping->get_packages() : array(
+			array(
+				'rates' => array(
+					new \WC_Shipping_Rate(
+						'id',
+						__( 'No shipping', 'klarna-express-checkout' ),
+						0,
+						array(),
+						'no_shipping'
+					),
+				),
+			),
+		);
+
 		$shipping_options = self::get_shipping_options( $packages );
 
 		$selected_shipping_option_reference = WC()->session->get( 'chosen_shipping_methods', array() );
@@ -204,7 +219,7 @@ class OneStepCheckout {
 		}
 
 		return array(
-			'amount'                          => self::format_price( WC()->cart->get_cart_contents_total() + WC()->cart->get_cart_contents_tax() ) + $selected_shipping_option['amount'] ?? 0,
+			'amount'                          => self::format_price( WC()->cart->get_cart_contents_total() + WC()->cart->get_cart_contents_tax() ) + ( $selected_shipping_option['amount'] ?? 0 ),
 			'currency'                        => get_woocommerce_currency(),
 			'lineItems'                       => $line_items,
 			'selectedShippingOptionReference' => $selected_shipping_option['shippingOptionReference'] ?? '',
