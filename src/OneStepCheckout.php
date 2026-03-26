@@ -82,7 +82,7 @@ class OneStepCheckout {
 	 * Handle the waiting for the order to be ready before redirecting.
 	 *
 	 * @param \WC_Order $order The WooCommerce order.
-	 * @param string $kec_unique_id The KEC unique ID.
+	 * @param string    $kec_unique_id The KEC unique ID.
 	 *
 	 * @return string|null The redirect URL or null if not ready.
 	 */
@@ -103,7 +103,7 @@ class OneStepCheckout {
 
 			// Wait before the next attempt to check if the redirect url is set.
 			usleep( $sleep_time );
-			$attempt++;
+			++$attempt;
 		}
 		return $default_redirect_url;
 	}
@@ -117,7 +117,7 @@ class OneStepCheckout {
 		$unique_id = uniqid( 'kec_one_step_' );
 		WC()->session->set( 'kec_one_step_unique_id', $unique_id );
 		return array(
-			'collectCustomerProfile' => array(
+			'collectCustomerProfile'    => array(
 				'profile:name',
 				'profile:email',
 				'profile:phone',
@@ -125,16 +125,16 @@ class OneStepCheckout {
 				'profile:billing_address',
 				'profile:country',
 			),
-			'shippingConfig' => array(
+			'shippingConfig'            => array(
 				'mode' => 'EDITABLE',
-				//'supportedCountries' => array_keys( WC()->countries->get_shipping_countries() ),
+				// 'supportedCountries' => array_keys( WC()->countries->get_shipping_countries() ),
 			),
-			'paymentRequestReference' => $unique_id,
+			'paymentRequestReference'   => $unique_id,
 			'customerInteractionConfig' => array(
 				'returnUrl' => add_query_arg( array( 'kec-one-step' => $unique_id ), home_url() ),
 			),
-			'amount' => self::format_price( WC()->cart->get_cart_contents_total() + WC()->cart->get_cart_contents_tax() ),
-			'currency' => get_woocommerce_currency(),
+			'amount'                    => self::format_price( WC()->cart->get_cart_contents_total() + WC()->cart->get_cart_contents_tax() ),
+			'currency'                  => get_woocommerce_currency(),
 			'supplementaryPurchaseData' => array(
 				'lineItems' => self::get_cart_items(),
 			),
@@ -173,21 +173,39 @@ class OneStepCheckout {
 		WC()->cart->calculate_shipping();
 		WC()->cart->calculate_totals();
 
-		$packages         = WC()->shipping->get_packages();
+		$shipping_needed = WC()->cart->needs_shipping();
+		// Klarna still expects shipping options for virtual carts, so provide a zero-cost fallback rate.
+		$packages = $shipping_needed ? WC()->shipping->get_packages() : array(
+			array(
+				'rates' => array(
+					new \WC_Shipping_Rate(
+						'id',
+						__( 'No shipping', 'klarna-express-checkout' ),
+						0,
+						array(),
+						'no_shipping'
+					),
+				),
+			),
+		);
+
 		$shipping_options = self::get_shipping_options( $packages );
 
 		$selected_shipping_option_reference = WC()->session->get( 'chosen_shipping_methods', array() );
-		$selected_shipping_option_reference = ( ! empty( $selected_shipping_option_reference ) ) ? $selected_shipping_option_reference[ 0 ] : '';
+		$selected_shipping_option_reference = ( ! empty( $selected_shipping_option_reference ) ) ? $selected_shipping_option_reference[0] : '';
 
-		$selected_shipping_option = array_filter( $shipping_options, function( $option ) use ( $selected_shipping_option_reference ) {
-			return $option['shippingOptionReference'] === $selected_shipping_option_reference;
-		} );
+		$selected_shipping_option = array_filter(
+			$shipping_options,
+			function ( $option ) use ( $selected_shipping_option_reference ) {
+				return $option['shippingOptionReference'] === $selected_shipping_option_reference;
+			}
+		);
 
 		// If we did not get a selected shipping option, use the first one.
-		$selected_shipping_option = ( empty( $selected_shipping_option ) && ! empty( $shipping_options ) ) ? $shipping_options[ 0 ] : reset( $selected_shipping_option );
+		$selected_shipping_option = ( empty( $selected_shipping_option ) && ! empty( $shipping_options ) ) ? $shipping_options[0] : reset( $selected_shipping_option );
 
 		$line_items = self::get_cart_items();
-		OneStepCheckout::create_order( $payment_request_id, $payment_token  );
+		self::create_order( $payment_request_id, $payment_token );
 
 		// If we have a selected shipping option, add it to the line items.
 		if ( ! empty( $selected_shipping_option ) ) {
@@ -201,11 +219,11 @@ class OneStepCheckout {
 		}
 
 		return array(
-			'amount' => self::format_price( WC()->cart->get_cart_contents_total() + WC()->cart->get_cart_contents_tax() ) + $selected_shipping_option['amount'] ?? 0,
-			'currency' => get_woocommerce_currency(),
-			'lineItems' => $line_items,
+			'amount'                          => self::format_price( WC()->cart->get_cart_contents_total() + WC()->cart->get_cart_contents_tax() ) + ( $selected_shipping_option['amount'] ?? 0 ),
+			'currency'                        => get_woocommerce_currency(),
+			'lineItems'                       => $line_items,
 			'selectedShippingOptionReference' => $selected_shipping_option['shippingOptionReference'] ?? '',
-			'shippingOptions' => $shipping_options,
+			'shippingOptions'                 => $shipping_options,
 		);
 	}
 
@@ -256,8 +274,8 @@ class OneStepCheckout {
 		}
 
 		return array(
-			'amount' => self::format_price( WC()->cart->get_cart_contents_total() + WC()->cart->get_cart_contents_tax() + $selected_shipping_method->get_cost() + $selected_shipping_method->get_shipping_tax() ),
-			'lineItems' => $line_items
+			'amount'    => self::format_price( WC()->cart->get_cart_contents_total() + WC()->cart->get_cart_contents_tax() + $selected_shipping_method->get_cost() + $selected_shipping_method->get_shipping_tax() ),
+			'lineItems' => $line_items,
 		);
 	}
 
@@ -268,7 +286,7 @@ class OneStepCheckout {
 	 */
 	private static function get_cart_items() {
 		$line_items = array();
-		foreach( WC()->cart->get_cart() as $cart_item ) {
+		foreach ( WC()->cart->get_cart() as $cart_item ) {
 			/**
 			 * @var \WC_Product $product
 			 */
@@ -336,7 +354,7 @@ class OneStepCheckout {
 	 */
 	private static function format_price( $price ) {
 		$price = floatval( $price ); // Ensure the price is a float value to avoid issues with string formatting.
-		return intval( number_format( $price * 100, 0, ".", "" ) );
+		return intval( number_format( $price * 100, 0, '.', '' ) );
 	}
 
 	/**
@@ -398,26 +416,30 @@ class OneStepCheckout {
 	 * @return void
 	 */
 	private static function set_order_item_products( &$order ) {
-	    foreach ( WC()->cart->get_cart() as $cart_item ) {
-	    	/**
-	    	 * Get the product from the cart item.
-	    	 *
-	    	 * @var \WC_Product $product
-	    	 */
-	    	$product = $cart_item['data'];
-	    	if ( ! $product->exists() || $product->is_type( 'line_item' ) ) {
-	    		continue;
-	    	}
+		foreach ( WC()->cart->get_cart() as $cart_item ) {
+			/**
+			 * Get the product from the cart item.
+			 *
+			 * @var \WC_Product $product
+			 */
+			$product = $cart_item['data'];
+			if ( ! $product->exists() || $product->is_type( 'line_item' ) ) {
+				continue;
+			}
 
-	    	$order->add_product( $product, $cart_item['quantity'], array(
-	    		'totals' => array(
-	    			'subtotal'     => $cart_item['line_subtotal'],
-	    			'subtotal_tax' => $cart_item['line_subtotal_tax'],
-	    			'total'        => $cart_item['line_total'],
-	    			'tax'          => $cart_item['line_tax'],
-	    		),
-	    	) );
-	    }
+			$order->add_product(
+				$product,
+				$cart_item['quantity'],
+				array(
+					'totals' => array(
+						'subtotal'     => $cart_item['line_subtotal'],
+						'subtotal_tax' => $cart_item['line_subtotal_tax'],
+						'total'        => $cart_item['line_total'],
+						'tax'          => $cart_item['line_tax'],
+					),
+				)
+			);
+		}
 	}
 
 	/**
@@ -428,12 +450,12 @@ class OneStepCheckout {
 	 * @return void
 	 */
 	private static function set_order_item_shipping( &$order ) {
-	    $shipping_methods = WC()->cart->get_shipping_methods();
-	    foreach ( $shipping_methods as $shipping_method ) {
+		$shipping_methods = WC()->cart->get_shipping_methods();
+		foreach ( $shipping_methods as $shipping_method ) {
 			$shipping_item = new \WC_Order_Item_Shipping();
 			$shipping_item->set_shipping_rate( $shipping_method );
 			$order->add_item( $shipping_item );
-	    }
+		}
 	}
 
 	/**
@@ -443,7 +465,8 @@ class OneStepCheckout {
 	 *
 	 * @return void
 	 */
-	private static function set_order_address( &$order ) {;
+	private static function set_order_address( &$order ) {
+
 		foreach ( WC()->customer->get_billing() as $key => $value ) {
 			// Only set values that are not empty and the method exists for the key on the order.
 			if ( ! empty( $value ) && method_exists( $order, "set_billing_$key" ) ) {
@@ -483,7 +506,6 @@ class OneStepCheckout {
 		$order->set_customer_ip_address( \WC_Geolocation::get_ip_address() );
 		$order->set_customer_user_agent( wc_get_user_agent() );
 
-
 		// Set the payment request ID and payment token as order meta.
 		$order->update_meta_data( '_kec_payment_request_id', $payment_request_id );
 		$order->update_meta_data( '_kec_unique_id', $unique_id );
@@ -509,16 +531,16 @@ class OneStepCheckout {
 	 * Set the address to the order when we are finalizing the order.
 	 *
 	 * @param \WC_Order $order The WooCommerce order.
-	 * @param array $payment_data The payment data from Klarna.
+	 * @param array     $payment_data The payment data from Klarna.
 	 *
 	 * @return void
 	 */
 	public static function set_order_address_from_payment_data( &$order, $payment_data ) {
-		$context           = $payment_data['stateContext'] ?? [];
-		$billing_customer  = $context['klarnaCustomer']['customerProfile'] ?? [];
-		$billing_address   = $context['klarnaCustomer']['customerProfile']['address'] ?? [];
-		$shipping_customer = $context['shipping']['recipient'] ?? [];
-		$shipping_address  = $context['shipping']['address'] ?? [];
+		$context           = $payment_data['stateContext'] ?? array();
+		$billing_customer  = $context['klarnaCustomer']['customerProfile'] ?? array();
+		$billing_address   = $context['klarnaCustomer']['customerProfile']['address'] ?? array();
+		$shipping_customer = $context['shipping']['recipient'] ?? array();
+		$shipping_address  = $context['shipping']['address'] ?? array();
 
 		self::set_address_field( $order, $billing_customer['givenName'] ?? '', 'first_name', 'billing' );
 		self::set_address_field( $order, $billing_customer['familyName'] ?? '', 'last_name', 'billing' );
@@ -543,15 +565,15 @@ class OneStepCheckout {
 	}
 
 		/**
-	 * Set a specific address field to the order if it exists in the provided address data.
-	 *
-	 * @param \WC_Order $order The WooCommerce order to update. Passed by reference.
-	 * @param mixed $value The value to set.
-	 * @param string $field The order field to update.
-	 * @param string $address_type The type of address ('billing' or 'shipping').
-	 *
-	 * @return void
-	 */
+		 * Set a specific address field to the order if it exists in the provided address data.
+		 *
+		 * @param \WC_Order $order The WooCommerce order to update. Passed by reference.
+		 * @param mixed     $value The value to set.
+		 * @param string    $field The order field to update.
+		 * @param string    $address_type The type of address ('billing' or 'shipping').
+		 *
+		 * @return void
+		 */
 	private static function set_address_field( &$order, $value, $field, $address_type ) {
 		// Only set values that are not empty and the method exists for the key on the order.
 		if ( ! empty( $value ) && method_exists( $order, "set_{$address_type}_{$field}" ) ) {

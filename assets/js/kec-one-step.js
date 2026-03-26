@@ -26,14 +26,24 @@ const KECOneStep = {
   isInitiating: false,
   variationId: null,
 
-  /**
-   * Initialize the Klarna Express Checkout script for One Step Checkout.
-   *
-   * @returns {Promise<void>}
-   */
-  init: async function (e) {
-    KECOneStep.params = configData;
-    KECOneStep.Klarna = klarna_interoperability.Klarna;
+  getContainer() {
+    return document.querySelector('#kec-pay-button');
+  },
+
+  isMounted() {
+    const container = KECOneStep.getContainer();
+    return !!(container && container.childElementCount > 0);
+  },
+
+  mountButton() {
+    const container = KECOneStep.getContainer();
+    if (!container || !KECOneStep.Klarna) {
+      return;
+    }
+
+    if (KECOneStep.isMounted()) {
+      return;
+    }
 
     KECOneStep.Klarna.Payment
       .button( {
@@ -45,12 +55,37 @@ const KECOneStep = {
         initiate: async () => await KECOneStep.onClickPayButton()
       })
       .mount("#kec-pay-button");
+  },
+
+  onCartUpdated() {
+    window.requestAnimationFrame(() => {
+      KECOneStep.mountButton();
+    });
+  },
+
+  /**
+   * Initialize the Klarna Express Checkout script for One Step Checkout.
+   *
+   * @returns {Promise<void>}
+   */
+  init: async function (e) {
+    KECOneStep.params = configData;
+    KECOneStep.Klarna = klarna_interoperability.Klarna;
+
+    KECOneStep.mountButton();
 
     KECOneStep.Klarna.Payment.on("shippingaddresschange", KECOneStep.onShippingAddressChange);
     KECOneStep.Klarna.Payment.on("shippingoptionselect", KECOneStep.onShippingOptionSelect);
 
     // Listen for the WooCommerce variation change event and set the selected variation ID.
     $(document.body).on("found_variation", KECOneStep.onFoundVariation);
+    KECOneStep.hasBoundEvents = true;
+    
+
+    $(document.body).on(
+      "updated_cart_totals added_to_cart removed_from_cart updated_checkout updated_wc_div wc-blocks_added_to_cart wc-blocks_removed_from_cart",
+      KECOneStep.onCartUpdated
+    );
 
   },
 
