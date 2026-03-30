@@ -175,21 +175,19 @@ class OneStepCheckout {
 
 		$shipping_needed = WC()->cart->needs_shipping();
 		// Klarna still expects shipping options for virtual carts, so provide a zero-cost fallback rate.
-		$packages = $shipping_needed ? WC()->shipping->get_packages() : array(
-			array(
-				'rates' => array(
-					new \WC_Shipping_Rate(
-						'id',
-						__( 'No shipping', 'klarna-express-checkout' ),
-						0,
-						array(),
-						'no_shipping'
-					),
+		if ( $shipping_needed ) {
+			$shipping_options = self::get_shipping_options( WC()->shipping->get_packages() );
+		} else {
+			$shipping_options = array(
+				array(
+					'shippingOptionReference' => 'digital-delivery',
+					'amount'                  => 0,
+					'displayName'             => __( 'Digital delivery', 'klarna-express-checkout' ),
+					'description'             => __( 'Digital delivery', 'klarna-express-checkout' ),
+					'shippingType'            => 'DIGITAL_DOWNLOAD',
 				),
-			),
-		);
-
-		$shipping_options = self::get_shipping_options( $packages );
+			);
+		}
 
 		$selected_shipping_option_reference = WC()->session->get( 'chosen_shipping_methods', array() );
 		$selected_shipping_option_reference = ( ! empty( $selected_shipping_option_reference ) ) ? $selected_shipping_option_reference[0] : '';
