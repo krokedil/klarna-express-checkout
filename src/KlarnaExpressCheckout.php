@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || exit;
  * @package Krokedil\KlarnaExpressCheckout
  */
 class KlarnaExpressCheckout {
-	public const VERSION = '2.1.1';
+	public const VERSION = '2.1.2';
 
 	/**
 	 * Reference to the Session class.
