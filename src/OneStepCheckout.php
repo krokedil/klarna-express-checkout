@@ -174,10 +174,10 @@ class OneStepCheckout {
 		WC()->cart->calculate_totals();
 
 		$shipping_needed = WC()->cart->needs_shipping();
-		// Klarna still expects shipping options for virtual carts, so provide a zero-cost fallback rate.
 		if ( $shipping_needed ) {
 			$shipping_options = self::get_shipping_options( WC()->shipping->get_packages() );
 		} else {
+			// Klarna still expects shipping options for virtual carts, so provide a default one with free shipping and digital delivery.
 			$shipping_options = array(
 				array(
 					'shippingOptionReference' => 'digital-delivery',
