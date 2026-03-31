@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ------------------
+## [2.1.2] - 2026-03-31
+### Changed
+* Improved structure of shipping data sent for digital products in the one step checkout flow.
+* Removed checks for acquiring partner keys for the one step flow, as it is now available to all users.
+
 ## [2.1.1] - 2026-02-03
 ### Fix
 * The Webhook settings are now hidden unless the 'One step' flow setting is selected.
