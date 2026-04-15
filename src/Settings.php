@@ -285,7 +285,7 @@ class Settings {
 			),
 			'kec_flow'           => array(
 				'title'       => __( 'Flow', 'klarna-express-checkout' ),
-				'description' => __( 'Select the checkout flow for Klarna Express Checkout. One step is only available for stores integrating Klarna through a different payment provider.', 'klarna-express-checkout' ),
+				'description' => __( 'Select the checkout flow for Klarna Express Checkout.', 'klarna-express-checkout' ),
 				'type'        => ! empty( $flow_options ) ? 'select' : 'hidden',
 				'default'     => 'two_step',
 				'options'     => $flow_options,
