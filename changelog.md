@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ------------------
+## [2.1.3] - 2026-04-21
+### Fix
+* Clarified the description for the `kec_flow` setting to indicate that the one step flow is now available to all users.
+
 ## [2.1.2] - 2026-03-31
 ### Changed
 * Improved structure of shipping data sent for digital products in the one step checkout flow.
