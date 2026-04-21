@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ------------------
+## [2.1.4] - 2026-04-21
+### Security
+* Removed unused php-jwt package. The current version of the package has a security vulnerability that prevented package updates, but since we do not use it anywhere in the codebase, we can safely remove it from our dependencies.
+
 ## [2.1.3] - 2026-04-21
 ### Fix
 * Clarified the description for the `kec_flow` setting to indicate that the one step flow is now available to all users.
