@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fix
+* Disabled the KEC button on variable products until a variation is selected.
+
 ------------------
 ## [2.1.4] - 2026-04-21
 ### Security
