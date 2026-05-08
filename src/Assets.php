@@ -264,10 +264,12 @@ class Assets {
 			'currency'     => get_woocommerce_currency(),
 			'amount'       => intval( floatval( $amount ) * 100 ),
 			'source'       => is_cart() ? 'cart' : ( is_product() ? get_the_ID() : 'unknown' ),
-			'is_variation' => is_product() ? ( wc_get_product( get_the_ID() )->is_type( 'variation' ) ? true : false ) : false,
+			'is_variation' => is_product() && wc_get_product( get_the_ID() )->is_type( 'variable' ),
 		);
 
 		KP_Assets::register_module_data( $one_step_params, '@klarna/kec-one-step' );
 		wp_enqueue_script_module( '@klarna/kec-one-step' );
+		// Enqueue the style for the cart page.
+		wp_enqueue_style( 'kec-cart' );
 	}
 }
