@@ -226,6 +226,12 @@ class Assets {
 	 * @return void
 	 */
 	public function enqueue_one_step_assets() {
+		$client_id = $this->settings->get_credentials_secret();
+
+		if ( empty( $client_id ) ) {
+			return;
+		}
+
 		$amount = WC()->cart ? WC()->cart->get_total( 'raw' ) : 0;
 		// If this a product page?
 		if ( is_product() ) {
@@ -256,7 +262,7 @@ class Assets {
 					'method' => 'POST',
 				),
 			),
-			'client_id'    => $this->settings->get_credentials_secret(),
+			'client_id'    => $client_id,
 			'testmode'     => $this->settings->is_testmode(),
 			'theme'        => $this->settings->get_theme(),
 			'shape'        => $this->settings->get_shape(),
