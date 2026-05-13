@@ -226,7 +226,9 @@ class Assets {
 	 * @return void
 	 */
 	public function enqueue_one_step_assets() {
-		$amount = WC()->cart ? WC()->cart->get_total( 'raw' ) : 0;
+		$amount  = WC()->cart ? WC()->cart->get_total( 'raw' ) : 0;
+		$product = null;
+
 		// If this a product page?
 		if ( is_product() ) {
 			$product = wc_get_product( get_the_ID() );
@@ -264,12 +266,12 @@ class Assets {
 			'currency'            => get_woocommerce_currency(),
 			'amount'              => intval( floatval( $amount ) * 100 ),
 			'source'              => is_cart() ? 'cart' : ( is_product() ? get_the_ID() : 'unknown' ),
-			'is_variable_product' => is_product() && wc_get_product( get_the_ID() )->is_type( 'variable' ),
+			'is_variable_product' => is_product() && $product && $product->is_type( 'variable' ),
 		);
 
 		KP_Assets::register_module_data( $one_step_params, '@klarna/kec-one-step' );
 		wp_enqueue_script_module( '@klarna/kec-one-step' );
-		// Enqueue the style for the cart page.
+		// Enqueue the style for the one-step flow on cart and product pages.
 		wp_enqueue_style( 'kec-cart' );
 	}
 }
