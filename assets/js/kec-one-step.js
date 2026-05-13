@@ -36,31 +36,15 @@ const KECOneStep = {
     return !!(container && container.childElementCount > 0);
   },
 
-  mountButton( remount = false ) {
+  mountButton() {
     const container = KECOneStep.getContainer();
 
     if (!container || !KECOneStep.Klarna) {
       return;
     }
 
-    if (KECOneStep.isMounted() && !remount) {
+    if (KECOneStep.isMounted()) {
       return;
-    }
-
-    container.innerHTML = '';
-
-    const disabled = KECOneStep.params.is_variation && null === KECOneStep.variationId;
-    const buttonArgs = {
-      theme: KECOneStep.params.theme,
-      shape: KECOneStep.params.shape,
-      locale: KECOneStep.params.locale,
-      intents: ["PAY"],
-      initiationMode: "DEVICE_BEST",
-      initiate: async () => await KECOneStep.onClickPayButton()
-    };
-
-    if(disabled) {
-      buttonArgs.disabled = true;
     }
 
     KECOneStep.Klarna.Payment
