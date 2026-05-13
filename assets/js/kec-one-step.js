@@ -21,7 +21,6 @@ const KECOneStep = {
     currency: '',
     amount: 0,
     source: 'unknown',
-    is_variable_product: false,
   },
   Klarna: null,
   button: null,
@@ -52,7 +51,6 @@ const KECOneStep = {
         theme: KECOneStep.params.theme,
         shape: KECOneStep.params.shape,
         locale: KECOneStep.params.locale,
-        disabled: true,
         intents: ["PAY"],
         initiationMode: "DEVICE_BEST",
         initiate: async () => await KECOneStep.onClickPayButton()
@@ -66,8 +64,8 @@ const KECOneStep = {
     });
   },
 
-  updateButtonState() {
-    const disabled = KECOneStep.params.is_variable_product && null === KECOneStep.variationId;
+  updateProductVariationButton() {
+    const disabled = null === KECOneStep.variationId;
     const KECButton = KECOneStep.getContainer();
 
     if (!KECOneStep.button) {
@@ -114,7 +112,7 @@ const KECOneStep = {
    */
   onFoundVariation(event, variation) {
     KECOneStep.variationId = variation.variation_id;
-    KECOneStep.updateButtonState();
+    KECOneStep.updateProductVariationButton();
   },
 
   /**
@@ -215,7 +213,7 @@ const KECOneStep = {
    */
   onVariationClear() {
     KECOneStep.variationId = null;
-    KECOneStep.updateButtonState();
+    KECOneStep.updateProductVariationButton();
   }
 
 }

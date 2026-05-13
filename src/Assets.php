@@ -236,7 +236,7 @@ class Assets {
 		}
 
 		$one_step_params = array(
-			'ajax'                => array(
+			'ajax'      => array(
 				'get_initiate_body'      => array(
 					'url'    => \WC_AJAX::get_endpoint( 'kec_one_step_get_initiate_body' ),
 					'nonce'  => wp_create_nonce( 'kec_one_step_get_initiate_body' ),
@@ -258,15 +258,14 @@ class Assets {
 					'method' => 'POST',
 				),
 			),
-			'client_id'           => $this->settings->get_credentials_secret(),
-			'testmode'            => $this->settings->is_testmode(),
-			'theme'               => $this->settings->get_theme(),
-			'shape'               => $this->settings->get_shape(),
-			'locale'              => $this->locale,
-			'currency'            => get_woocommerce_currency(),
-			'amount'              => intval( floatval( $amount ) * 100 ),
-			'source'              => is_cart() ? 'cart' : ( is_product() ? get_the_ID() : 'unknown' ),
-			'is_variable_product' => is_product() && $product && $product->is_type( 'variable' ),
+			'client_id' => $this->settings->get_credentials_secret(),
+			'testmode'  => $this->settings->is_testmode(),
+			'theme'     => $this->settings->get_theme(),
+			'shape'     => $this->settings->get_shape(),
+			'locale'    => $this->locale,
+			'currency'  => get_woocommerce_currency(),
+			'amount'    => intval( floatval( $amount ) * 100 ),
+			'source'    => is_cart() ? 'cart' : ( is_product() ? get_the_ID() : 'unknown' ),
 		);
 
 		KP_Assets::register_module_data( $one_step_params, '@klarna/kec-one-step' );
