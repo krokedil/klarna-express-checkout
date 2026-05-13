@@ -21,7 +21,7 @@ const KECOneStep = {
     currency: '',
     amount: 0,
     source: 'unknown',
-    is_variable: false,
+    is_variable_product: false,
   },
   Klarna: null,
   isInitiating: false,
@@ -38,7 +38,6 @@ const KECOneStep = {
 
   mountButton() {
     const container = KECOneStep.getContainer();
-
     if (!container || !KECOneStep.Klarna) {
       return;
     }
@@ -67,7 +66,7 @@ const KECOneStep = {
   },
 
   updateButtonState() {
-    const disabled = KECOneStep.params.is_variable && null === KECOneStep.variationId;
+    const disabled = KECOneStep.params.is_variable_product && null === KECOneStep.variationId;
     const KECButton = KECOneStep.getContainer();
 
     if (!KECButton) {
