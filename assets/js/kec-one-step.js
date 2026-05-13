@@ -21,7 +21,7 @@ const KECOneStep = {
     currency: '',
     amount: 0,
     source: 'unknown',
-    is_variation: false,
+    is_variable: false,
   },
   Klarna: null,
   isInitiating: false,
@@ -64,16 +64,34 @@ const KECOneStep = {
     }
 
     KECOneStep.Klarna.Payment
-      .button(buttonArgs)
+      .button( {
+        theme: KECOneStep.params.theme,
+        shape: KECOneStep.params.shape,
+        locale: KECOneStep.params.locale,
+        disabled: true,
+        intents: ["PAY"],
+        initiationMode: "DEVICE_BEST",
+        initiate: async () => await KECOneStep.onClickPayButton()
+      })
       .mount(container);
-
-    container.classList.toggle('kec-button-disabled', disabled);
   },
 
   onCartUpdated() {
     window.requestAnimationFrame(() => {
       KECOneStep.mountButton();
     });
+  },
+
+  updateButtonState() {
+    const disabled = KECOneStep.params.is_variable && null === KECOneStep.variationId;
+    const KECButton = KECOneStep.getContainer();
+
+    if (!KECButton) {
+      return;
+    }
+
+    KECButton.toggleState('disabled', disabled);
+    KECButton.classList.toggle('kec-button-disabled', disabled);
   },
 
   /**
@@ -107,7 +125,7 @@ const KECOneStep = {
    */
   onFoundVariation(event, variation) {
     KECOneStep.variationId = variation.variation_id;
-    KECOneStep.mountButton(true);
+    KECOneStep.updateButtonState();
   },
 
   /**
@@ -208,7 +226,7 @@ const KECOneStep = {
    */
   onVariationClear() {
     KECOneStep.variationId = null;
-    KECOneStep.mountButton(true);
+    KECOneStep.updateButtonState();
   }
 
 }
