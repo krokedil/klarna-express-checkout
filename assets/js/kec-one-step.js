@@ -24,6 +24,7 @@ const KECOneStep = {
     is_variable_product: false,
   },
   Klarna: null,
+  button: null,
   isInitiating: false,
   variationId: null,
 
@@ -46,7 +47,7 @@ const KECOneStep = {
       return;
     }
 
-    KECOneStep.Klarna.Payment
+    KECOneStep.button = KECOneStep.Klarna.Payment
       .button( {
         theme: KECOneStep.params.theme,
         shape: KECOneStep.params.shape,
@@ -69,11 +70,16 @@ const KECOneStep = {
     const disabled = KECOneStep.params.is_variable_product && null === KECOneStep.variationId;
     const KECButton = KECOneStep.getContainer();
 
+    if (!KECOneStep.button) {
+      return;
+    }
+
+    KECOneStep.button.toggleState('disabled', disabled);
+
     if (!KECButton) {
       return;
     }
 
-    KECButton.toggleState('disabled', disabled);
     KECButton.classList.toggle('kec-button-disabled', disabled);
   },
 
