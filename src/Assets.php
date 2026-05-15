@@ -75,7 +75,7 @@ class Assets {
 
 		wp_register_script( 'kec-cart', "{$this->assets_path}js/kec-cart.js", array( 'jquery', 'klarnapayments' ), KlarnaExpressCheckout::VERSION, true );
 		wp_register_script( 'kec-checkout', "{$this->assets_path}js/kec-checkout.js", array( 'jquery', 'klarnapayments' ), KlarnaExpressCheckout::VERSION, true );
-		wp_register_script_module( '@klarna/kec-one-step', "{$this->assets_path}js/kec-one-step.js", array( '@klarna/klarna_network_session_token' ), KlarnaExpressCheckout::VERSION );
+		wp_register_script_module( '@klarna/kec-one-step', "{$this->assets_path}js/kec-one-step.js", array( '@klarna/interoperability_token' ), KlarnaExpressCheckout::VERSION );
 	}
 
 	/**
