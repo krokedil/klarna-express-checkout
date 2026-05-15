@@ -1,5 +1,5 @@
 const $ = jQuery;
-const { network_session } = await import("@klarna/klarna_network_session_token");
+const { network_session } = await import("@klarna/interoperability_token");
 let configData = {};
 
 const params = document.getElementById(
