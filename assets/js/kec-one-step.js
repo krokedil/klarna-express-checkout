@@ -1,5 +1,5 @@
 const $ = jQuery;
-const { network_session } = await import("@klarna/interoperability_token");
+const { klarna_interoperability } = await import("@klarna/interoperability_token");
 let configData = {};
 
 const params = document.getElementById(
@@ -70,7 +70,7 @@ const KECOneStep = {
    */
   init: async function (e) {
     KECOneStep.params = configData;
-    KECOneStep.Klarna = network_session.Klarna;
+    KECOneStep.Klarna = klarna_interoperability.Klarna;
 
     KECOneStep.mountButton();
 
