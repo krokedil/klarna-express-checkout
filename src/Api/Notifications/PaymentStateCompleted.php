@@ -27,8 +27,8 @@ class PaymentStateCompleted extends Handler {
 			return; // Maybe throw an error or log this incident.
 		}
 
-		$payment_request_id     = $payload['payment_request_id'] ?? null;
-		$interoperability_token = $payload['klarna_network_session_token'] ?? '';
+		$payment_request_id    = $payload['payment_request_id'] ?? null;
+		$network_session_token = $payload['klarna_network_session_token'] ?? '';
 
 		if ( ! $payment_request_id ) {
 			throw new \WP_Exception( 'Missing required fields in the payload.' );
@@ -40,19 +40,19 @@ class PaymentStateCompleted extends Handler {
 		// Set the order address data.
 		$this->set_address( $order, $payload );
 
-		// do_action( 'kec_process_order', $order, $interoperability_token, [], $payload['state'], $payload );
+		// do_action( 'kec_process_order', $order, $network_session_token, [], $payload['state'], $payload );
 		$redirect_url           = $order->get_checkout_order_received_url();
 		$ap_partner_integration = $this->get_acquiring_partner_integration();
 		if ( $ap_partner_integration ) {
 			$redirect_url = $ap_partner_integration->process_order_state(
 				$order,
-				$interoperability_token,
+				$network_session_token,
 				array(),
 				$payload['state'],
 				$payload
 			);
 		} else {
-			do_action( 'kec_process_order', $order, $interoperability_token, array(), $payload['state'], $payload );
+			do_action( 'kec_process_order', $order, $network_session_token, array(), $payload['state'], $payload );
 		}
 
 		// Store the redirect URL in order to redirect the customer when they get to the confirmation page.
