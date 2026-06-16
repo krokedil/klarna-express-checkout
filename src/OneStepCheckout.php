@@ -184,6 +184,7 @@ class OneStepCheckout {
 					'amount'                  => 0,
 					'displayName'             => __( 'Digital delivery', 'klarna-express-checkout' ),
 					'description'             => __( 'Digital delivery', 'klarna-express-checkout' ),
+					'shippingType'            => 'DIGITAL_EMAIL',
 				),
 			);
 		}

@@ -1,5 +1,5 @@
 const $ = jQuery;
-const { klarna_interoperability } = await import("@klarna/interoperability_token");
+const { klarna_interoperability } = await import("@klarna/network_session_token");
 let configData = {};
 
 const params = document.getElementById(
@@ -20,9 +20,11 @@ const KECOneStep = {
     locale: false,
     currency: '',
     amount: 0,
-    source: 'unknown'
+    source: 'unknown',
+    is_variable_product: false,
   },
   Klarna: null,
+  button: null,
   isInitiating: false,
   variationId: null,
 
@@ -45,22 +47,47 @@ const KECOneStep = {
       return;
     }
 
-    KECOneStep.Klarna.Payment
-      .button( {
-        theme: KECOneStep.params.theme,
-        shape: KECOneStep.params.shape,
-        locale: KECOneStep.params.locale,
-        intents: ["PAY"],
-        initiationMode: "DEVICE_BEST",
-        initiate: async () => await KECOneStep.onClickPayButton()
-      })
-      .mount("#kec-pay-button");
+    const buttonArgs = {
+      theme: KECOneStep.params.theme,
+      shape: KECOneStep.params.shape,
+      locale: KECOneStep.params.locale,
+      intents: ["PAY"],
+      initiationMode: "DEVICE_BEST",
+      initiate: async () => await KECOneStep.onClickPayButton()
+    };
+    
+
+    if( KECOneStep.params.is_variable_product && !KECOneStep.variationId ) {
+        buttonArgs.disabled = true;
+        container.classList.add('kec-button-disabled');
+    }
+
+    KECOneStep.button = KECOneStep.Klarna.Payment
+      .button(buttonArgs)
+      .mount(container);
   },
 
   onCartUpdated() {
     window.requestAnimationFrame(() => {
       KECOneStep.mountButton();
     });
+  },
+
+  updateProductVariationButton() {
+    const disabled = null === KECOneStep.variationId;
+    const KECButton = KECOneStep.getContainer();
+
+    if (!KECOneStep.button) {
+      return;
+    }
+
+    KECOneStep.button.toggleState('disabled', disabled);
+
+    if (!KECButton) {
+      return;
+    }
+
+    KECButton.classList.toggle('kec-button-disabled', disabled);
   },
 
   /**
@@ -77,32 +104,11 @@ const KECOneStep = {
     KECOneStep.Klarna.Payment.on("shippingaddresschange", KECOneStep.onShippingAddressChange);
     KECOneStep.Klarna.Payment.on("shippingoptionselect", KECOneStep.onShippingOptionSelect);
 
-    // Listen for the WooCommerce variation change event and set the selected variation ID.
-    $(document.body).on("found_variation", KECOneStep.onFoundVariation);
-    KECOneStep.hasBoundEvents = true;
-    
-
     $(document.body).on(
       "updated_cart_totals added_to_cart removed_from_cart updated_checkout updated_wc_div wc-blocks_added_to_cart wc-blocks_removed_from_cart",
       KECOneStep.onCartUpdated
     );
 
-  },
-
-  /**
-   * Checks if we are on a product page, and if so, if the product is a variable product.
-   * If it is, it will see if the customer has selected a variation.
-   *
-   * @returns {boolean} True if we can continue, or if we need to wait for a variation to be set.
-   */
-  checkVariation() {
-    const { source, is_variation } = KECOneStep.params;
-
-    if (source === 'cart' || !is_variation) {
-      return true;
-    }
-
-    return KECOneStep.variationId !== null; // Variation must be selected to continue
   },
 
   /**
@@ -115,6 +121,7 @@ const KECOneStep = {
    */
   onFoundVariation(event, variation) {
     KECOneStep.variationId = variation.variation_id;
+    KECOneStep.updateProductVariationButton();
   },
 
   /**
@@ -149,6 +156,13 @@ const KECOneStep = {
     return body;
   },
 
+  /**
+   * Handle the shipping address change event from Klarna.
+   *
+   * @param {object} data
+   * @param {object} shippingAddress
+   * @returns {Promise<Object>} The updated payment request object.
+   */
   onShippingAddressChange: async function (data, shippingAddress) {
     const { url, nonce, method } = KECOneStep.params.ajax.shipping_change;
 
@@ -172,6 +186,13 @@ const KECOneStep = {
     return body
   },
 
+  /**
+   * Handle the shipping option select event from Klarna.
+   *
+   * @param {object} _ Unused parameter.
+   * @param {object} shippingOption The selected shipping option.
+   * @returns {Promise<Object>} The updated payment request object.
+   */
   onShippingOptionSelect: async function (_, shippingOption) {
     const { url, nonce, method } = KECOneStep.params.ajax.shipping_option_change;
 
@@ -193,8 +214,21 @@ const KECOneStep = {
 
     return body
   },
+
+  /**
+   * Handle when the customer clicks the clear variation button or when the variation is reset.
+   *
+   * @returns {void}
+   */
+  onVariationClear() {
+    KECOneStep.variationId = null;
+    KECOneStep.updateProductVariationButton();
+  }
+
 }
 
 window.kecOneStep = KECOneStep;
 
+$(document.body).on("found_variation", KECOneStep.onFoundVariation);
 $('body').on('klarna_wc_sdk_loaded', KECOneStep.init);
+$(document.body).on("reset_data", KECOneStep.onVariationClear);
