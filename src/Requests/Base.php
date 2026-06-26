@@ -16,7 +16,7 @@ abstract class Base extends \KP_Requests {
 	protected function get_base_url( $country, $settings ) {
 		$testmode     = wc_string_to_bool( $settings['testmode'] ?? 'no' ); // Get the testmode setting.
 
-		if ($testmode) {
+		if ( $testmode ) {
 			return "https://api-global.test.klarna.com/";
 		}
 
