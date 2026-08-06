@@ -20,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fix
 * Disabled the KEC button on variable products until a variation is selected.
 
+### Fix
+* Fall back to the product ID for the `lineItemReference` when a product has no SKU, so the line item always passes Klarna's validation.
+
 ## [2.1.5] - 2026-05-11
 ### Fix
 * Added a one step flow check to ensure a valid client ID is found before attempting to register module data.
